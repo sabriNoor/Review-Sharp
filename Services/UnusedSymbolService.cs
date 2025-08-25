@@ -64,7 +64,7 @@ namespace ReviewSharp.Services
         {
             foreach (var method in root.DescendantNodes().OfType<MethodDeclarationSyntax>())
             {
-                var bodyNode = (SyntaxNode)method.Body ?? method.ExpressionBody as SyntaxNode;
+                var bodyNode = method.Body as SyntaxNode ?? method.ExpressionBody as SyntaxNode;
                 if (bodyNode == null)
                 {
                     continue;
@@ -115,7 +115,7 @@ namespace ReviewSharp.Services
         {
             foreach (var localFunc in root.DescendantNodes().OfType<LocalFunctionStatementSyntax>())
             {
-                var bodyNode = (SyntaxNode)localFunc.Body ?? localFunc.ExpressionBody as SyntaxNode;
+                var bodyNode = localFunc.Body as SyntaxNode ?? localFunc.ExpressionBody as SyntaxNode;
                 if (bodyNode == null)
                 {
                     continue;
