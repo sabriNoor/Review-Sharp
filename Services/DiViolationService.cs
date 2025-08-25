@@ -10,10 +10,13 @@ namespace ReviewSharp.Services
     public class DiViolationService : ICodeReviewService
     {
         // Constants for better maintainability
-        private static readonly string[] DtoPatterns = { "dto", "model", "entity", "viewmodel", "request", "response", "command", "query" };
-        private static readonly string[] SimpleTypes = { "string", "int", "long", "double", "decimal", "bool", "datetime", "guid", "uri", "timespan" };
+        private static readonly string[] DtoPatterns = {"dto", "model", "entity", "viewmodel", "request", "response", "command", "query",
+            "record", "data", "contract", "schema", "vo", "aggregate"}; 
+        private static readonly string[] SimpleTypes = {"string", "int", "long", "double", "decimal", "bool", "datetime", "guid", "uri", "timespan",
+            "object", "byte", "short", "float", "char", "sbyte", "ushort", "uint", "ulong"}; 
         private static readonly string[] CollectionTypes = { "list", "array", "dictionary", "hashset", "queue", "stack", "icollection", "idictionary", "ienumerable" };
-        private static readonly string[] ServicePatterns = { "service", "manager", "handler", "processor", "facade", "repository", "provider", "logger", "log", "client", "adapter", "factory", "builder", "validator", "authenticator", "authorizer" };
+        private static readonly string[] ServicePatterns = { "service", "manager", "handler", "processor", "facade", "repository", "provider", "logger", "log",
+            "client", "adapter", "factory", "builder", "validator", "authenticator", "authorizer", "mediator" };
         private static readonly string[] TestPatterns = { "test", "spec", "fixture", "mock", "stub" };
         private static readonly string[] ConfigPatterns = { "config", "options", "settings", "appsettings" };
         private static readonly string[] ConfigMethodPatterns = { "config", "setup", "configure" };
@@ -21,10 +24,10 @@ namespace ReviewSharp.Services
         public List<CodeReviewResult> Review(CompilationUnitSyntax root)
         {
             var results = new List<CodeReviewResult>();
-            
+
             results.AddRange(CheckDirectInstantiation(root));
             results.AddRange(CheckServiceLocatorPattern(root));
-            
+
             return results;
         }
 
@@ -84,14 +87,14 @@ namespace ReviewSharp.Services
             var forStatement = creation.Ancestors().OfType<ForStatementSyntax>().FirstOrDefault();
             if (forStatement == null) return false;
 
-            return forStatement.Initializers.Any(init => 
+            return forStatement.Initializers.Any(init =>
                 init.ToString().Contains(creation.ToString()));
         }
 
         private bool IsDtoOrSimpleType(TypeSyntax type)
         {
             var typeName = type.ToString().ToLower();
-            
+
             // Common DTO patterns
             if (DtoPatterns.Any(pattern => typeName.Contains(pattern)))
                 return true;
@@ -101,7 +104,7 @@ namespace ReviewSharp.Services
                 return true;
 
             // Collections of simple types
-            if (typeName.Contains("list<") || typeName.Contains("ienumerable<") || 
+            if (typeName.Contains("list<") || typeName.Contains("ienumerable<") ||
                 typeName.Contains("array<") || typeName.Contains("dictionary<") ||
                 typeName.Contains("icollection<") || typeName.Contains("idictionary<"))
                 return true;
@@ -129,7 +132,7 @@ namespace ReviewSharp.Services
         private bool IsLikelyService(TypeSyntax type)
         {
             var typeName = type.ToString().ToLower();
-            
+
             // Common service patterns
             if (ServicePatterns.Any(pattern => typeName.Contains(pattern)))
                 return true;
@@ -167,7 +170,7 @@ namespace ReviewSharp.Services
         private bool IsConfigurationInstantiation(ObjectCreationExpressionSyntax creation)
         {
             var typeName = creation.Type.ToString().ToLower();
-            
+
             // Check if the type itself is configuration-related
             if (ConfigPatterns.Any(pattern => typeName.Contains(pattern)))
                 return true;
