@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ReviewSharp.Interfaces;
 using ReviewSharp.Models;
@@ -85,7 +86,21 @@ namespace ReviewSharp.Services
                 ? method.Body.ToFullString()
                 : method.ExpressionBody?.Expression.ToFullString() ?? string.Empty;
 
-            return NormalizeCode(raw);
+            var bodyNode = method.Body as SyntaxNode ?? method.ExpressionBody as SyntaxNode;
+            if (bodyNode == null)
+            {
+                return NormalizeCode(raw);
+            }
+
+            var parameterNames = method.ParameterList?.Parameters.Select(p => p.Identifier.Text).ToHashSet() ?? new HashSet<string>();
+            var localNames = bodyNode.DescendantNodes()
+                .OfType<LocalDeclarationStatementSyntax>()
+                .SelectMany(ld => ld.Declaration.Variables.Select(v => v.Identifier.Text))
+                .ToHashSet();
+            var targetNames = new HashSet<string>(parameterNames.Concat(localNames));
+
+            var canonical = CanonicalizeIdentifiers(bodyNode, targetNames);
+            return NormalizeCode(canonical);
         }
 
         private static string NormalizeLocalFunction(LocalFunctionStatementSyntax local)
@@ -94,7 +109,20 @@ namespace ReviewSharp.Services
                 ? local.Body.ToFullString()
                 : local.ExpressionBody?.Expression.ToFullString() ?? string.Empty;
 
-            return NormalizeCode(raw);
+            var bodyNode = local.Body as SyntaxNode ?? local.ExpressionBody as SyntaxNode;
+            if (bodyNode == null)
+            {
+                return NormalizeCode(raw);
+            }
+            var parameterNames = local.ParameterList?.Parameters.Select(p => p.Identifier.Text).ToHashSet() ?? new HashSet<string>();
+            var localNames = bodyNode.DescendantNodes()
+                .OfType<LocalDeclarationStatementSyntax>()
+                .SelectMany(ld => ld.Declaration.Variables.Select(v => v.Identifier.Text))
+                .ToHashSet();
+            var targetNames = new HashSet<string>(parameterNames.Concat(localNames));
+
+            var canonical = CanonicalizeIdentifiers(bodyNode, targetNames);
+            return NormalizeCode(canonical);
         }
 
         private static string NormalizeCode(string code)
@@ -114,6 +142,43 @@ namespace ReviewSharp.Services
                 }
             }
             return sb.ToString();
+        }
+
+        private static string CanonicalizeIdentifiers(SyntaxNode node, HashSet<string> targetNames)
+        {
+            var rewriter = new IdentifierCanonicalizer(targetNames);
+            var rewritten = rewriter.Visit(node);
+            return rewritten?.ToFullString() ?? node.ToFullString();
+        }
+
+        private sealed class IdentifierCanonicalizer : CSharpSyntaxRewriter
+        {
+            private readonly HashSet<string> _targetNames;
+            private readonly Dictionary<string, string> _nameMap = new Dictionary<string, string>();
+            private int _counter = 0;
+
+            public IdentifierCanonicalizer(HashSet<string> targetNames)
+            {
+                _targetNames = targetNames;
+            }
+
+            public override SyntaxNode? VisitIdentifierName(IdentifierNameSyntax node)
+            {
+                var name = node.Identifier.Text;
+                if (!_targetNames.Contains(name))
+                {
+                    return base.VisitIdentifierName(node);
+                }
+
+                if (!_nameMap.TryGetValue(name, out var canonical))
+                {
+                    _counter++;
+                    canonical = $"v{_counter}";
+                    _nameMap[name] = canonical;
+                }
+
+                return node.WithIdentifier(SyntaxFactory.Identifier(canonical));
+            }
         }
 
         private static string ComputeHash(string text)
