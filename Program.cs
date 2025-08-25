@@ -7,9 +7,10 @@ builder.Services.AddControllersWithViews();
 
 // Register code review services and parser
 builder.Services.AddScoped<ICodeParserService, CodeParserService>();
-builder.Services.AddScoped<ICodeReviewService, NamingConventionService>();
 builder.Services.AddScoped<ICodeReviewOrchestratorService, CodeReviewOrchestratorService>();
+builder.Services.AddScoped<ICodeReviewService, NamingConventionService>();
 builder.Services.AddScoped<ICodeReviewService, SyntaxCheckService>();
+builder.Services.AddScoped<ICodeReviewService, DiViolationService>();
 builder.Services.AddScoped<ICodeReviewService, DuplicateCodeService>();
 
 var app = builder.Build();
