@@ -12,8 +12,15 @@ namespace ReviewSharp.Services
         public List<CodeReviewResult> Review(CompilationUnitSyntax root)
         {
             var results = new List<CodeReviewResult>();
+            results.AddRange(CheckDirectInstantiation(root));
+            results.AddRange(CheckMissingConstructorInjection(root));
+            results.AddRange(CheckServiceLocatorPattern(root));
+            return results;
+        }
 
-            // Check for direct instantiation (new keyword) inside classes
+        private IEnumerable<CodeReviewResult> CheckDirectInstantiation(CompilationUnitSyntax root)
+        {
+            var results = new List<CodeReviewResult>();
             var objectCreations = root.DescendantNodes().OfType<ObjectCreationExpressionSyntax>();
             foreach (var creation in objectCreations)
             {
@@ -29,8 +36,12 @@ namespace ReviewSharp.Services
                     });
                 }
             }
+            return results;
+        }
 
-            // Check for missing constructor injection (fields with no assignment in constructor)
+        private IEnumerable<CodeReviewResult> CheckMissingConstructorInjection(CompilationUnitSyntax root)
+        {
+            var results = new List<CodeReviewResult>();
             var classes = root.DescendantNodes().OfType<ClassDeclarationSyntax>();
             foreach (var cls in classes)
             {
@@ -59,8 +70,12 @@ namespace ReviewSharp.Services
                     }
                 }
             }
+            return results;
+        }
 
-            // Check for service locator pattern (e.g., IServiceProvider.GetService)
+        private IEnumerable<CodeReviewResult> CheckServiceLocatorPattern(CompilationUnitSyntax root)
+        {
+            var results = new List<CodeReviewResult>();
             var invocations = root.DescendantNodes().OfType<InvocationExpressionSyntax>();
             foreach (var invocation in invocations)
             {
@@ -76,7 +91,6 @@ namespace ReviewSharp.Services
                     });
                 }
             }
-
             return results;
         }
     }
