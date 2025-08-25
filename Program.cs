@@ -9,6 +9,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ICodeParserService, CodeParserService>();
 builder.Services.AddScoped<ICodeReviewService, NamingConventionService>();
 builder.Services.AddScoped<ICodeReviewOrchestratorService, CodeReviewOrchestratorService>();
+builder.Services.AddScoped<ICodeReviewService, SyntaxCheckService>();
 
 var app = builder.Build();
 
@@ -19,6 +20,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.Urls.Add("https://localhost:7054");
+app.Urls.Add("http://localhost:5071");
 app.UseRouting();
 
 app.UseAuthorization();
