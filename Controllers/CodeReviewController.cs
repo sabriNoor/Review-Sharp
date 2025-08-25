@@ -36,8 +36,15 @@ namespace ReviewSharp.Controllers
                 return View("Upload");
             }
 
+            string code;
+            using (var reader = new StreamReader(file.OpenReadStream()))
+            {
+                code = await reader.ReadToEndAsync();
+            }
+
             var results = await _orchestratorService.ReviewAsync(file);
             ViewBag.Results = results;
+            ViewBag.Code = code;
             return View("Result");
         }
 
