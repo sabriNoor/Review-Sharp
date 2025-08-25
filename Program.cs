@@ -14,6 +14,7 @@ builder.Services.AddScoped<ICodeReviewService, DiViolationService>();
 builder.Services.AddScoped<ICodeReviewService, AsyncMethodNamingService>();
 builder.Services.AddScoped<ICodeReviewService, DuplicateCodeService>();
 builder.Services.AddScoped<ICodeReviewService, AsyncMethodBestPracticesService>();
+builder.Services.AddScoped<ICodeReviewService, UnusedSymbolService>();
 
 var app = builder.Build();
 
