@@ -7,26 +7,24 @@ builder.Services.AddControllersWithViews();
 
 // Register code review services and parser
 builder.Services.AddScoped<ICodeParserService, CodeParserService>();
-builder.Services.AddScoped<ICodeReviewOrchestratorService, CodeReviewOrchestratorService>();
 builder.Services.AddScoped<ICodeReviewService, NamingConventionService>();
+builder.Services.AddScoped<ICodeReviewOrchestratorService, CodeReviewOrchestratorService>();
 builder.Services.AddScoped<ICodeReviewService, SyntaxCheckService>();
-builder.Services.AddScoped<ICodeReviewService, DiViolationService>();
-builder.Services.AddScoped<ICodeReviewService, AsyncMethodNamingService>();
 builder.Services.AddScoped<ICodeReviewService, DuplicateCodeService>();
 builder.Services.AddScoped<ICodeReviewService, AsyncMethodBestPracticesService>();
 builder.Services.AddScoped<ICodeReviewService, UnusedSymbolService>();
-
+builder.Services.AddScoped<ICodeReviewService, SwitchStatementService>();
+builder.Services.AddScoped<ICodeReviewService, DiViolationService>();
+builder.Services.AddScoped<ICodeReviewService, AsyncMethodNamingService>();
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/CodeReview/Error");
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
-app.Urls.Add("https://localhost:7054");
-app.Urls.Add("http://localhost:5071");
 app.UseRouting();
 
 app.UseAuthorization();
