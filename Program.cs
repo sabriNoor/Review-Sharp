@@ -10,6 +10,7 @@ builder.Services.AddScoped<ICodeParserService, CodeParserService>();
 builder.Services.AddScoped<ICodeReviewService, NamingConventionService>();
 builder.Services.AddScoped<ICodeReviewOrchestratorService, CodeReviewOrchestratorService>();
 builder.Services.AddScoped<ICodeReviewService, SyntaxCheckService>();
+builder.Services.AddScoped<ICodeReviewService, DuplicateCodeService>();
 
 var app = builder.Build();
 
