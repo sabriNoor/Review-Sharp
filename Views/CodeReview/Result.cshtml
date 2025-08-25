@@ -1,0 +1,34 @@
+@{
+    ViewBag.Title = "Code Review Results";
+}
+<h2>Code Review Results</h2>
+@using ReviewSharp.Models
+@if (ViewBag.Results != null && ((List<CodeReviewResult>)ViewBag.Results).Count > 0)
+{
+    <table border="1" cellpadding="5" style="border-collapse:collapse;">
+        <thead>
+            <tr>
+                <th>Rule</th>
+                <th>Message</th>
+                <th>Severity</th>
+                <th>Line</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var result in (List<CodeReviewResult>)ViewBag.Results)
+        {
+            <tr>
+                <td>@result.RuleName</td>
+                <td>@result.Message</td>
+                <td>@result.Severity</td>
+                <td>@(result.LineNumber)</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <div>No issues found. Your code looks good!</div>
+}
+<a href="@Url.Action("Upload", "CodeReview")">Upload another file</a>
