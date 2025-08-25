@@ -3,32 +3,125 @@
 }
 <h2>Code Review Results</h2>
 @using ReviewSharp.Models
-@if (ViewBag.Results != null && ((List<CodeReviewResult>)ViewBag.Results).Count > 0)
-{
-    <table border="1" cellpadding="5" style="border-collapse:collapse;">
-        <thead>
-            <tr>
-                <th>Rule</th>
-                <th>Message</th>
-                <th>Severity</th>
-                <th>Line</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var result in (List<CodeReviewResult>)ViewBag.Results)
-        {
-            <tr>
-                <td>@result.RuleName</td>
-                <td>@result.Message</td>
-                <td>@result.Severity</td>
-                <td>@(result.LineNumber)</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+
+@{
+    var results = ViewBag.Results as List<CodeReviewResult> ?? new List<CodeReviewResult>();
+    var code = ViewBag.Code as string ?? string.Empty;
+    var lines = code.Replace("\r\n", "\n").Split('\n');
+    var commentsByLine = results
+        .Where(r => r.LineNumber.HasValue)
+        .GroupBy(r => r.LineNumber.GetValueOrDefault())
+        .ToDictionary(g => g.Key, g => g.ToList());
+
+    var severityCounts = results
+        .GroupBy(r => string.IsNullOrWhiteSpace(r.Severity) ? "Info" : r.Severity.Trim())
+        .ToDictionary(g => g.Key, g => g.Count());
 }
-else
+
+<div style="display:flex; gap:24px; align-items:flex-start; flex-wrap:nowrap; width:100%;">
+    <div style="flex:1 1 55%; min-width:0;">
+        <div style="background:#1e1e1e; color:#dcdcdc; border:1px solid #333; border-radius:6px; overflow:hidden;">
+            <div style="padding:10px 12px; border-bottom:1px solid #333;">
+                <h3 style="margin:0; font-size:16px; color:#9cdcfe;">Source</h3>
+            </div>
+            <div style="max-height:80vh; overflow:auto;">
+        <table style="width:100%; border-collapse:collapse; color:#dcdcdc;">
+            <thead>
+                <tr>
+                    <th style="width:56px; text-align:right; padding:8px; border-bottom:1px solid #333; color:#9cdcfe;">Line</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #333; color:#9cdcfe;">Code</th>
+                </tr>
+            </thead>
+            <tbody>
+@for (int i = 0; i < lines.Length; i++)
 {
-    <div>No issues found. Your code looks good!</div>
+    var lineNumber = i + 1;
+    var line = lines[i];
+                <tr>
+                    <td style="vertical-align:top; text-align:right; padding:4px 8px; color:#858585;">@lineNumber</td>
+                    <td style="vertical-align:top; padding:4px 8px; font-family:Consolas, 'Courier New', monospace; white-space:pre; background:#1e1e1e;">
+                        @{
+                            var encoded = System.Net.WebUtility.HtmlEncode(line);
+                            if (commentsByLine.ContainsKey(lineNumber))
+                            {
+                                var cmts = commentsByLine[lineNumber]
+                                    .Select(c => ($"{(string.IsNullOrWhiteSpace(c.Severity) ? "" : c.Severity + ": ")}{c.Message}").Trim());
+                                var suffix = " // " + string.Join(" // ", cmts);
+                                @Html.Raw(encoded + suffix);
+                            }
+                            else
+                            {
+                                @Html.Raw(encoded);
+                            }
+                        }
+                    </td>
+                </tr>
 }
+            </tbody>
+        </table>
+            </div>
+        </div>
+    </div>
+    <div style="flex:1 1 45%; min-width:0;">
+        <div style="background:#1e1e1e; color:#dcdcdc; border:1px solid #333; border-radius:6px; overflow:hidden;">
+            <div style="padding:10px 12px; border-bottom:1px solid #333;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <h3 style="margin:0; font-size:16px; color:#9cdcfe;">Issues</h3>
+                    <span style="font-size:12px; color:#858585;">@results.Count</span>
+                </div>
+                @if (results.Count > 0)
+                {
+                    <table style="margin-top:8px; width:auto; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#252526;">
+                                <th style="text-align:left; padding:6px 8px; border:1px solid #333; color:#9cdcfe;">Severity</th>
+                                <th style="text-align:right; padding:6px 8px; border:1px solid #333; color:#9cdcfe;">Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var kv in severityCounts.OrderByDescending(kv => kv.Value))
+                        {
+                            <tr>
+                                <td style="padding:6px 8px; border:1px solid #333; color:@(kv.Key == "Error" ? "#f44336" : kv.Key == "Warning" ? "#ff9800" : "#2196f3");">@kv.Key</td>
+                                <td style="text-align:right; padding:6px 8px; border:1px solid #333; color:#dcdcdc;">@kv.Value</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+            </div>
+            <div style="max-height:80vh; overflow:auto;">
+            @if (results.Count > 0)
+            {
+                <table style="width:100%; border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#252526;">
+                            <th style="text-align:right; padding:8px; border-bottom:1px solid #333; color:#9cdcfe; width:64px;">Line</th>
+                            <th style="text-align:left; padding:8px; border-bottom:1px solid #333; color:#9cdcfe; width:90px;">Severity</th>
+                            <th style="text-align:left; padding:8px; border-bottom:1px solid #333; color:#9cdcfe; width:120px;">Rule</th>
+                            <th style="text-align:left; padding:8px; border-bottom:1px solid #333; color:#9cdcfe;">Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var result in results.OrderBy(r => r.LineNumber ?? int.MaxValue))
+                    {
+                        <tr>
+                            <td style="text-align:right; padding:6px 8px; color:#858585;">@(result.LineNumber)</td>
+                            <td style="padding:6px 8px; color:@(result.Severity == "Error" ? "#f44336" : result.Severity == "Warning" ? "#ff9800" : "#2196f3");">@result.Severity</td>
+                            <td style="padding:6px 8px; color:#dcdcdc;">@result.RuleName</td>
+                            <td style="padding:6px 8px; color:#dcdcdc;">@result.Message</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div style="padding:12px; color:#a6a6a6;">No issues found. Your code looks good!</div>
+            }
+            </div>
+        </div>
+    </div>
+</div>
+
 <a href="@Url.Action("Upload", "CodeReview")">Upload another file</a>
