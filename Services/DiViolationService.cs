@@ -31,7 +31,7 @@ namespace ReviewSharp.Services
                     {
                         RuleName = "DI Violation: Direct Instantiation",
                         Message = $"Class '{parentClass.Identifier.Text}' directly instantiates '{creation.Type}'. Use dependency injection instead.",
-                        Severity = "Error",
+                        Severity = "Warning",
                         LineNumber = creation.GetLocation().GetLineSpan().StartLinePosition.Line + 1
                     });
                 }
