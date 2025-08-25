@@ -11,6 +11,7 @@ builder.Services.AddScoped<ICodeReviewService, NamingConventionService>();
 builder.Services.AddScoped<ICodeReviewOrchestratorService, CodeReviewOrchestratorService>();
 builder.Services.AddScoped<ICodeReviewService, SyntaxCheckService>();
 builder.Services.AddScoped<ICodeReviewService, DuplicateCodeService>();
+builder.Services.AddScoped<ICodeReviewService, UnusedSymbolService>();
 
 var app = builder.Build();
 
