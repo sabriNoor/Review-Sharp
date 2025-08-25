@@ -11,9 +11,11 @@ builder.Services.AddScoped<ICodeReviewService, NamingConventionService>();
 builder.Services.AddScoped<ICodeReviewOrchestratorService, CodeReviewOrchestratorService>();
 builder.Services.AddScoped<ICodeReviewService, SyntaxCheckService>();
 builder.Services.AddScoped<ICodeReviewService, DuplicateCodeService>();
+builder.Services.AddScoped<ICodeReviewService, AsyncMethodBestPracticesService>();
 builder.Services.AddScoped<ICodeReviewService, UnusedSymbolService>();
 builder.Services.AddScoped<ICodeReviewService, SwitchStatementService>();
-
+builder.Services.AddScoped<ICodeReviewService, DiViolationService>();
+builder.Services.AddScoped<ICodeReviewService, AsyncMethodNamingService>();
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
