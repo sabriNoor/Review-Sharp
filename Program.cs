@@ -16,6 +16,8 @@ builder.Services.AddScoped<ICodeReviewService, UnusedSymbolService>();
 builder.Services.AddScoped<ICodeReviewService, SwitchStatementService>();
 builder.Services.AddScoped<ICodeReviewService, DiViolationService>();
 builder.Services.AddScoped<ICodeReviewService, AsyncMethodNamingService>();
+builder.Services.AddScoped<ICodeReviewService, NullCheckStyleService>();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
