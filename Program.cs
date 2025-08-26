@@ -17,6 +17,8 @@ builder.Services.AddScoped<ICodeReviewService, DiViolationService>();
 builder.Services.AddScoped<ICodeReviewService, AsyncMethodNamingService>();
 builder.Services.AddScoped<ICodeReviewService, NullCheckStyleService>();
 builder.Services.AddScoped<ICodeReviewService, EmptyCatchService>();
+builder.Services.AddScoped<ICodeReviewService, HardcodedSecretsService>();
+
 
 var app = builder.Build();
 
