@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ReviewSharp.csproj" />
+    <ProjectReference Include="..\ReviewSharpApp\ReviewSharpApp.csproj" />
   </ItemGroup>
 
 </Project>
