@@ -17,6 +17,99 @@
         .ToDictionary(g => g.Key, g => g.Count());
 }
 
+
+<button id="darkModeToggle" class="dark-toggle-btn mt-5" aria-pressed="false" style="margin-bottom: 1rem;">🌙 Dark Mode</button>
+
+<style>
+    .dark-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 2rem;
+        background: linear-gradient(90deg, #23272b 60%, #3fa9f5 100%);
+        color: #e0e0e0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        cursor: pointer;
+        transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+        outline: none;
+    }
+    .dark-toggle-btn:hover, .dark-toggle-btn:focus {
+        background: linear-gradient(90deg, #3fa9f5 0%, #23272b 100%);
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(63,169,245,0.15);
+    }
+    .dark-mode .dark-toggle-btn {
+        background: linear-gradient(90deg, #23272b 60%, #ffd166 100%);
+        color: #ffd166;
+    }
+    .dark-mode .dark-toggle-btn:hover, .dark-mode .dark-toggle-btn:focus {
+        background: linear-gradient(90deg, #ffd166 0%, #23272b 100%);
+        color: #23272b;
+    }
+
+    body.dark-mode {
+        background-color: #181a1b !important;
+        color: #e0e0e0 !important;
+    }
+    .dark-mode .card,
+    .dark-mode .card-header,
+    .dark-mode .card-body {
+        background-color: #23272b !important;
+        color: #e0e0e0 !important;
+    }
+    .dark-mode table {
+        background-color: #23272b !important;
+        color: #e0e0e0 !important;
+        border: none !important;
+    }
+    .dark-mode th, .dark-mode td {
+        background-color: #23272b !important;
+        color: #e0e0e0 !important;
+        border: none !important;
+    }
+    .dark-mode tr:nth-child(even) {
+        background-color: #202225 !important;
+    }
+    .dark-mode pre, .dark-mode code {
+        background: #22272e !important;
+        color: #d1d5da !important;
+    }
+    .dark-mode .badge.bg-danger { background-color: #ff6b6b !important; color: #fff !important; }
+    .dark-mode .badge.bg-warning { background-color: #ffd166 !important; color: #222 !important; }
+    .dark-mode .badge.bg-info { background-color: #3fa9f5 !important; color: #fff !important; }
+    .dark-mode .alert-success { background-color: #223322 !important; color: #b6fcb6 !important; border-color: #2e4d2e !important; }
+</style>
+
+<script>
+    const toggle = document.getElementById('darkModeToggle');
+    function updateToggleState() {
+        if (document.body.classList.contains('dark-mode')) {
+            toggle.innerHTML = '☀️ Light Mode';
+            toggle.setAttribute('aria-pressed', 'true');
+        } else {
+            toggle.innerHTML = '🌙 Dark Mode';
+            toggle.setAttribute('aria-pressed', 'false');
+        }
+    }
+    toggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('darkMode', 'on');
+        } else {
+            localStorage.setItem('darkMode', 'off');
+        }
+        updateToggleState();
+    });
+    if (localStorage.getItem('darkMode') === 'on') {
+        document.body.classList.add('dark-mode');
+    }
+    updateToggleState();
+</script>
+
 <div class="container-fluid py-4" style="max-width: 1400px; margin:auto;">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -125,13 +218,13 @@
                                         <th style="width:60px;" class="text-end">Line</th>
                                         <th style="width:90px;">Severity</th>
                                         <th style="width:120px;">Rule</th>
-                                        <th>Message</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
                                     @foreach (var result in results.OrderBy(r => r.LineNumber ?? int.MaxValue))
-                                    {
-                                        <tr>
+        {
+            <tr>
                                             <td class="text-end text-secondary small">@result.LineNumber</td>
                                             <td>
                                                 <span class="badge @(result.Severity == "Error" ? "bg-danger" : result.Severity == "Warning" ? "bg-warning text-dark" : "bg-info")">
@@ -140,14 +233,14 @@
                                             </td>
                                             <td class="text-light small">@result.RuleName</td>
                                             <td class="text-light">@result.Message</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+            </tr>
+        }
+        </tbody>
+    </table>
                         </div>
-                    }
-                    else
-                    {
+}
+else
+{
                         <div class="alert alert-success rounded-3">
                             ✅ No issues found. Your code looks clean!
                         </div>
