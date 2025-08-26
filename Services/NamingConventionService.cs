@@ -101,7 +101,7 @@ namespace ReviewSharp.Services
                     {
                         RuleName = "Class Naming Convention",
                         Message = $"Class '{className}' should be PascalCase.",
-                        Severity = "Error",
+                        Severity = "Warning",
                         LineNumber = cls.GetLocation().GetLineSpan().StartLinePosition.Line + 1
                     });
                 }
