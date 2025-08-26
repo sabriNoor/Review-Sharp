@@ -13,6 +13,9 @@ builder.Services.AddScoped<ICodeReviewService, SyntaxCheckService>();
 builder.Services.AddScoped<ICodeReviewService, DuplicateCodeService>();
 builder.Services.AddScoped<ICodeReviewService, UnusedSymbolService>();
 builder.Services.AddScoped<ICodeReviewService, SwitchStatementService>();
+builder.Services.AddScoped<ICodeReviewService, DiViolationService>();
+builder.Services.AddScoped<ICodeReviewService, AsyncMethodNamingService>();
+builder.Services.AddScoped<ICodeReviewService, NullCheckStyleService>();
 builder.Services.AddScoped<ICodeReviewService, EmptyCatchService>();
 
 var app = builder.Build();
