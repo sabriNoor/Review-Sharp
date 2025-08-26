@@ -123,11 +123,22 @@ namespace ReviewSharp.Services
                     return true;
                 }
 
-                // var name = "" or other string literal init
-                if (typeSyntax is IdentifierNameSyntax { Identifier.Text: "var" } || typeSyntax is VarPatternSyntax)
+                // var name = "" or other string-like initializer
+                if (typeSyntax is IdentifierNameSyntax { Identifier.Text: "var" })
                 {
-                    // check initializer is string literal
-                    // (we only have variable here; need to find its declaration to get initializer)
+                    var initializerValue = variable.Initializer?.Value;
+                    if (initializerValue is LiteralExpressionSyntax les && les.IsKind(SyntaxKind.StringLiteralExpression))
+                    {
+                        return true;
+                    }
+                    if (initializerValue is InterpolatedStringExpressionSyntax)
+                    {
+                        return true;
+                    }
+                    if (initializerValue is MemberAccessExpressionSyntax maes && maes.ToString() == "string.Empty")
+                    {
+                        return true;
+                    }
                 }
             }
 
