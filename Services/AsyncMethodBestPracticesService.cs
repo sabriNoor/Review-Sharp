@@ -163,7 +163,7 @@ namespace ReviewSharp.Services
         private bool IsEventHandler(MethodDeclarationSyntax method)
         {
             var parameters = method.ParameterList.Parameters;
-            return parameters.Count > 0 && parameters.Last().Type != null && parameters.Last().Type.ToString().EndsWith("EventArgs");
+            return parameters.Count > 0 && parameters.Last().Type != null && parameters.Last().Type!.ToString().EndsWith("EventArgs");
         }
 
         private bool ContainsBlockingCall(MethodDeclarationSyntax method)
