@@ -30,7 +30,7 @@ namespace ReviewSharpApp.Tests
         [InlineData("string connectionString = \"Server=.;Database=Test;\";", false)] // not matched by value pattern
         [InlineData("string username = \"admin\";", false)]
         [InlineData("string password;", false)] // no value
-        public void Detect_HardcodedSecrets(string codeLine, bool shouldWarn)
+        public void  Review_HardcodedSecret_Variable_ShouldWarnWhenDetected(string codeLine, bool shouldWarn)
         {
             var source = $@"
             class TestClass {{
