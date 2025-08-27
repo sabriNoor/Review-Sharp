@@ -23,48 +23,186 @@ public class NamingConventionServiceTests
     }
 
   
-    [Theory]
-    [InlineData("class badClass { }", "Class Naming Convention", "Warning", 1)]
-    [InlineData("interface Service { }", "Interface Naming Convention", "Error", 1)]
-    [InlineData("class Test { void doThing() { } }", "Method Naming Convention", "Warning", 1)]
-    [InlineData("class Test { void DoThing(int NotCamel) { } }", "Parameter Naming Convention", "Info", 1)]
-    [InlineData("class Test { private int fieldName; }", "Field Naming Convention", "Warning", 1)]
-    [InlineData("class Test { public const int Not_All_Caps = 1; }", "Constant Naming Convention", "Warning", 1)]
-    [InlineData("class Test { public int propName { get; set; } }", "Property Naming Convention", "Warning", 1)]
-    [InlineData("enum badEnum { A }", "Enum Naming Convention", "Warning", 1)]
-    [InlineData("enum Colors { red }", "Enum Member Naming Convention", "Warning", 1)]
-    [InlineData("class Test { void Do() { int NotCamel = 0; } }", "Local Variable Naming Convention", "Info", 1)]
-    [InlineData("using System; class Test { void Handle(int x, EventArgs e) {} }", "Event Handler Naming Convention", "Info", 1)]
-    [InlineData("delegate void MyDelegate();", "Delegate Type Naming Convention", "Info", 1)]
-    [InlineData("class Box<TItem> { }", "Generic Type Parameter Naming Convention", "Info", 1)]
-    public void Review_InvalidNamePatterns_ReportExpectedRuleAndSeverity_AtExpectedLine(string source, string expectedRule, string expectedSeverity, int expectedLine)
+    [Fact]
+    public void ClassName_NotPascalCase_ReturnsWarningWithLine1()
     {
-        var results = GetResults(source);
-
-        // Assert
-        Assert.Contains(results, r => r.RuleName == expectedRule && r.Severity == expectedSeverity && r.LineNumber == expectedLine);
+        var results = GetResults("class badClass { }");
+        Assert.Contains(results, r => r.RuleName == "Class Naming Convention" && r.Severity == "Warning" && r.LineNumber == 1);
     }
 
-    [Theory]
-    [InlineData("class GoodClass { }", "Class Naming Convention")]
-    [InlineData("interface IGoodService { }", "Interface Naming Convention")]
-    [InlineData("class Test { void DoThing() { } }", "Method Naming Convention")]
-    [InlineData("class Test { void DoThing(int someValue) { } }", "Parameter Naming Convention")]
-    [InlineData("class Test { private int _count; }", "Field Naming Convention")]
-    [InlineData("class Test { public const int MAX_COUNT = 1; }", "Constant Naming Convention")]
-    [InlineData("class Test { public int Count { get; set; } }", "Property Naming Convention")]
-    [InlineData("enum Color { Red }", "Enum Naming Convention")]
-    [InlineData("enum Colors { Red }", "Enum Member Naming Convention")]
-    [InlineData("class Test { void Do() { int count = 0; } }", "Local Variable Naming Convention")]
-    [InlineData("using System; class Test { void OnClicked(object sender, EventArgs e) {} }", "Event Handler Naming Convention")]
-    [InlineData("delegate void CompletedHandler();", "Delegate Type Naming Convention")]
-    [InlineData("class Box<T> { }", "Generic Type Parameter Naming Convention")]
-    public void Review_CompliantNamePatterns_DoNotReportRule(string source, string unexpectedRule)
+    [Fact]
+    public void ClassName_Compliant_NoViolation()
     {
-        var results = GetResults(source);
+        var results = GetResults("class GoodClass { }");
+        Assert.DoesNotContain(results, r => r.RuleName == "Class Naming Convention");
+    }
 
-        // Assert
-        Assert.DoesNotContain(results, r => r.RuleName == unexpectedRule);
+    [Fact]
+    public void InterfaceName_NotPrefixedWithI_ReturnsErrorWithLine1()
+    {
+        var results = GetResults("interface Service { }");
+        Assert.Contains(results, r => r.RuleName == "Interface Naming Convention" && r.Severity == "Error" && r.LineNumber == 1);
+    }
+
+    [Fact]
+    public void InterfaceName_Compliant_NoViolation()
+    {
+        var results = GetResults("interface IGoodService { }");
+        Assert.DoesNotContain(results, r => r.RuleName == "Interface Naming Convention");
+    }
+
+    [Fact]
+    public void MethodName_NotPascalCase_ReturnsWarningWithLine1()
+    {
+        var results = GetResults("class Test { void doThing() { } }");
+        Assert.Contains(results, r => r.RuleName == "Method Naming Convention" && r.Severity == "Warning" && r.LineNumber == 1);
+    }
+
+    [Fact]
+    public void MethodName_Compliant_NoViolation()
+    {
+        var results = GetResults("class Test { void DoThing() { } }");
+        Assert.DoesNotContain(results, r => r.RuleName == "Method Naming Convention");
+    }
+
+    [Fact]
+    public void ParameterName_NotCamelCase_ReturnsInfoWithLine1()
+    {
+        var results = GetResults("class Test { void DoThing(int NotCamel) { } }");
+        Assert.Contains(results, r => r.RuleName == "Parameter Naming Convention" && r.Severity == "Info" && r.LineNumber == 1);
+    }
+
+    [Fact]
+    public void ParameterName_Compliant_NoViolation()
+    {
+        var results = GetResults("class Test { void DoThing(int someValue) { } }");
+        Assert.DoesNotContain(results, r => r.RuleName == "Parameter Naming Convention");
+    }
+
+    [Fact]
+    public void PrivateField_NotUnderscoreCamel_ReturnsWarningWithLine1()
+    {
+        var results = GetResults("class Test { private int fieldName; }");
+        Assert.Contains(results, r => r.RuleName == "Field Naming Convention" && r.Severity == "Warning" && r.LineNumber == 1);
+    }
+
+    [Fact]
+    public void PrivateField_Compliant_NoViolation()
+    {
+        var results = GetResults("class Test { private int _count; }");
+        Assert.DoesNotContain(results, r => r.RuleName == "Field Naming Convention");
+    }
+
+    [Fact]
+    public void Constant_NotAllCaps_ReturnsWarningWithLine1()
+    {
+        var results = GetResults("class Test { public const int Not_All_Caps = 1; }");
+        Assert.Contains(results, r => r.RuleName == "Constant Naming Convention" && r.Severity == "Warning" && r.LineNumber == 1);
+    }
+
+    [Fact]
+    public void Constant_Compliant_NoViolation()
+    {
+        var results = GetResults("class Test { public const int MAX_COUNT = 1; }");
+        Assert.DoesNotContain(results, r => r.RuleName == "Constant Naming Convention");
+    }
+
+    [Fact]
+    public void Property_NotPascalCase_ReturnsWarningWithLine1()
+    {
+        var results = GetResults("class Test { public int propName { get; set; } }");
+        Assert.Contains(results, r => r.RuleName == "Property Naming Convention" && r.Severity == "Warning" && r.LineNumber == 1);
+    }
+
+    [Fact]
+    public void Property_Compliant_NoViolation()
+    {
+        var results = GetResults("class Test { public int Count { get; set; } }");
+        Assert.DoesNotContain(results, r => r.RuleName == "Property Naming Convention");
+    }
+
+    [Fact]
+    public void Enum_NotPascalCase_ReturnsWarningWithLine1()
+    {
+        var results = GetResults("enum badEnum { A }");
+        Assert.Contains(results, r => r.RuleName == "Enum Naming Convention" && r.Severity == "Warning" && r.LineNumber == 1);
+    }
+
+    [Fact]
+    public void Enum_Compliant_NoViolation()
+    {
+        var results = GetResults("enum Color { Red }");
+        Assert.DoesNotContain(results, r => r.RuleName == "Enum Naming Convention");
+    }
+
+    [Fact]
+    public void EnumMember_NotPascalCase_ReturnsWarningWithLine1()
+    {
+        var results = GetResults("enum Colors { red }");
+        Assert.Contains(results, r => r.RuleName == "Enum Member Naming Convention" && r.Severity == "Warning" && r.LineNumber == 1);
+    }
+
+    [Fact]
+    public void EnumMember_Compliant_NoViolation()
+    {
+        var results = GetResults("enum Colors { Red }");
+        Assert.DoesNotContain(results, r => r.RuleName == "Enum Member Naming Convention");
+    }
+
+    [Fact]
+    public void LocalVariable_NotCamelCase_ReturnsInfoWithLine1()
+    {
+        var results = GetResults("class Test { void Do() { int NotCamel = 0; } }");
+        Assert.Contains(results, r => r.RuleName == "Local Variable Naming Convention" && r.Severity == "Info" && r.LineNumber == 1);
+    }
+
+    [Fact]
+    public void LocalVariable_Compliant_NoViolation()
+    {
+        var results = GetResults("class Test { void Do() { int count = 0; } }");
+        Assert.DoesNotContain(results, r => r.RuleName == "Local Variable Naming Convention");
+    }
+
+    [Fact]
+    public void EventHandler_NotOnOrHandler_ReturnsInfoWithLine1()
+    {
+        var results = GetResults("using System; class Test { void Handle(int x, EventArgs e) {} }");
+        Assert.Contains(results, r => r.RuleName == "Event Handler Naming Convention" && r.Severity == "Info" && r.LineNumber == 1);
+    }
+
+    [Fact]
+    public void EventHandler_Compliant_NoViolation()
+    {
+        var results = GetResults("using System; class Test { void OnClicked(object sender, EventArgs e) {} }");
+        Assert.DoesNotContain(results, r => r.RuleName == "Event Handler Naming Convention");
+    }
+
+    [Fact]
+    public void DelegateType_NotHandlerOrCallback_ReturnsInfoWithLine1()
+    {
+        var results = GetResults("delegate void MyDelegate();");
+        Assert.Contains(results, r => r.RuleName == "Delegate Type Naming Convention" && r.Severity == "Info" && r.LineNumber == 1);
+    }
+
+    [Fact]
+    public void DelegateType_Compliant_NoViolation()
+    {
+        var results = GetResults("delegate void CompletedHandler();");
+        Assert.DoesNotContain(results, r => r.RuleName == "Delegate Type Naming Convention");
+    }
+
+    [Fact]
+    public void GenericTypeParam_NotSingleUppercase_ReturnsInfoWithLine1()
+    {
+        var results = GetResults("class Box<TItem> { }");
+        Assert.Contains(results, r => r.RuleName == "Generic Type Parameter Naming Convention" && r.Severity == "Info" && r.LineNumber == 1);
+    }
+
+    [Fact]
+    public void GenericTypeParam_Compliant_NoViolation()
+    {
+        var results = GetResults("class Box<T> { }");
+        Assert.DoesNotContain(results, r => r.RuleName == "Generic Type Parameter Naming Convention");
     }
 
     [Fact]
