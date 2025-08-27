@@ -3,8 +3,8 @@
 .vscode/
 
 # Build output
-bin/
-obj/
+*/bin/
+*/obj/
 # User-specific files
 *.user
 *.suo
