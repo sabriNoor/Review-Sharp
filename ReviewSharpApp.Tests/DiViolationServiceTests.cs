@@ -29,7 +29,7 @@ public class DiViolationServiceTests
     [InlineData("var factory = new UserFactory();", true)]
     [InlineData("var repo = new Repository<User>();", true)]
     [InlineData("var arr = new UserService[5];", false)]
-    public void Class_DirectInstantiation_EmitsExpectedWarning(string codeLine, bool shouldWarn)
+    public void Review_DirectInstantiation_ShouldWarn_WhenInstantiatingObjectsManually (string codeLine, bool shouldWarn)
     {
         var source = $@"
         class TestClass {{
@@ -64,7 +64,7 @@ public class DiViolationServiceTests
     [InlineData("var dto = new UserDto();", false)]
     [InlineData("var factory = serviceProvider.GetRequiredService<UserFactory>();", true)]
     [InlineData("var nested = serviceProvider.GetService<NestedService>();", true)]
-    public void Class_ServiceLocator_EmitsExpectedWarning(string codeLine, bool shouldWarn)
+    public void Review_ServiceLocator_ShouldWarn_WhenResolvingDependenciesViaServiceProvider (string codeLine, bool shouldWarn)
     {
         var source = $@"
         class TestClass {{
