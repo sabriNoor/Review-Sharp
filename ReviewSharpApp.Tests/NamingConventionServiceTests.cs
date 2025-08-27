@@ -9,13 +9,12 @@ namespace ReviewSharpApp.Tests;
 
 public class NamingConventionServiceTests
 {
-    private static CompilationUnitSyntax Parse(string source) => CodeParsing.ParseCompilation(source);
 
     private static List<CodeReviewResult> GetResults(string source)
     {
         // Arrange
         var service = new NamingConventionService();
-        var root = Parse(source);
+        var root = CodeParsing.ParseCompilation(source);
 
         // Act
         var results = service.Review(root);
