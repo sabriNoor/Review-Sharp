@@ -37,10 +37,10 @@ public class NamingConventionServiceTests
     }
 
     [Fact]
-    public void InterfaceName_NotPrefixedWithI_ReturnsErrorWithLine1()
+    public void InterfaceName_NotPrefixedWithI_ReturnsWarningWithLine1()
     {
         var results = GetResults("interface Service { }");
-        Assert.Contains(results, r => r.RuleName == "Interface Naming Convention" && r.Severity == "Error" && r.LineNumber == 1);
+        Assert.Contains(results, r => r.RuleName == "Interface Naming Convention" && r.Severity == "Warning" && r.LineNumber == 1);
     }
 
     [Fact]
