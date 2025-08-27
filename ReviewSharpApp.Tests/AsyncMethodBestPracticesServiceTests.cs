@@ -23,7 +23,7 @@ namespace ReviewSharp.Tests
         }
 
         [Fact]
-        public void DoSomethingAsync_MissingAwait_EmitsWarning()
+        public void Review_AsyncMethodMissingAwait_ShouldWarn_WhenNoAwaitIsUsed()
         {
             var source = @"
                 using System.Threading.Tasks;
@@ -42,7 +42,7 @@ namespace ReviewSharp.Tests
         }
 
         [Fact]
-        public void DoSomethingAsyncVoid_ReturnsVoid_EmitsWarning()
+        public void Review_AsyncMethodReturnsVoid_ShouldWarn_WhenAsyncMethodReturnsVoid()
         {
             var source = @"
                 using System.Threading.Tasks;
@@ -58,7 +58,7 @@ namespace ReviewSharp.Tests
         }
 
         [Fact]
-        public void DoSomethingAsync_BlockingCall_EmitsWarning()
+        public void Review_AsyncMethodBlockingCall_ShouldWarn_WhenUsingBlockingCall()
         {
             var source = @"
                 using System.Threading.Tasks;
@@ -77,7 +77,7 @@ namespace ReviewSharp.Tests
         }
 
         [Fact]
-        public void DoSomethingAsync_CallWithoutAwait_EmitsWarning()
+        public void Review_AsyncCallWithoutAwait_ShouldWarn_WhenCallingAnotherAsyncMethodWithoutAwait()
         {
             var source = @"
                 using System.Threading.Tasks;
@@ -97,7 +97,7 @@ namespace ReviewSharp.Tests
         }
 
         [Fact]
-        public void DoSomethingAsync_InterfaceMethodWithNonTaskReturn_EmitsWarning()
+        public void Review_InterfaceAsyncMethodReturnType_ShouldWarn_WhenInterfaceMethodReturnsNonTask()
         {
             var source = @"
                 using System.Threading.Tasks;
@@ -113,7 +113,7 @@ namespace ReviewSharp.Tests
         }
         
         [Fact]
-        public void DoSomethingAsync_CorrectAsyncMethod_NoWarning()
+        public void Review_CorrectAsyncMethod_ShouldNotWarn_WhenProperAsyncPatternUsed()
         {
             var source = @"
                 using System.Threading.Tasks;
