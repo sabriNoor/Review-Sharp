@@ -1,0 +1,15 @@
+
+// Complex sample code with multiple syntax errors
+using System
+class C {
+    void M( {
+        int x = ;
+        string s = "Unclosed string;
+        if (x > 0) {
+            Console.WriteLine("Hello")
+        // Missing closing brace
+
+class D 
+    void N() {
+        int y = 2
+    // Missing closing braces
