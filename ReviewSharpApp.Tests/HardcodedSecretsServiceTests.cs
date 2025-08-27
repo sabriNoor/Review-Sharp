@@ -4,17 +4,21 @@ using ReviewSharp.Services;
 using ReviewSharp.Models;
 using Xunit;
 using System.Linq;
+using ReviewSharpApp.Tests.TestHelpers;
 
 namespace ReviewSharpApp.Tests
 {
     public class HardcodedSecretsServiceTests
     {
-        private static List<CodeReviewResult> GetResults(string source)
+        private static List<CodeReviewResult> GetResults(string code)
         {
+            // Arrange
             var service = new HardcodedSecretsService();
-            var tree = CSharpSyntaxTree.ParseText(source);
-            var root = tree.GetCompilationUnitRoot();
-            return service.Review(root);
+            var root = CodeParsing.ParseCompilation(code);
+            
+            // Act
+            var results = service.Review(root);
+            return results;
         }
 
         [Theory]
