@@ -27,7 +27,7 @@ public class AsyncMethodNamingServiceTests
     [InlineData("public async Task Do()", true, 3)]
     [InlineData("public async Task DoAsync()", false, 3)]
     [InlineData("public void Do()", false, 3)]
-    public void Class_MethodNaming_EmitsExpectedWarning(string methodCode, bool shouldWarn, int expectedLine)
+    public void  Review_AsyncClassMethod_ShouldWarn_WhenMissingAsyncSuffix(string methodCode, bool shouldWarn, int expectedLine)
     {
         var source = $@"
             using System.Threading.Tasks;
@@ -54,7 +54,7 @@ public class AsyncMethodNamingServiceTests
     [InlineData("Task DoAsync()", false, 3)]
     [InlineData("Task<int> DoAsync()", false, 3)]
     [InlineData("void Do()", false, 3)]
-    public void Interface_MethodNaming_EmitsExpectedWarning(string methodCode, bool shouldWarn, int expectedLine)
+    public void Review_AsyncInterfaceMethod_ShouldWarn_WhenMissingAsyncSuffix(string methodCode, bool shouldWarn, int expectedLine)
     {
         var source = $@"
             using System.Threading.Tasks;
