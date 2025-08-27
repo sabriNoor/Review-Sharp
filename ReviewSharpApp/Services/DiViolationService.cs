@@ -20,6 +20,12 @@ namespace ReviewSharp.Services
         private static readonly string[] TestPatterns = { "test", "spec", "fixture", "mock", "stub" };
         private static readonly string[] ConfigPatterns = { "config", "options", "settings", "appsettings" };
         private static readonly string[] ConfigMethodPatterns = { "config", "setup", "configure" };
+        private readonly bool _skipTestNamespaceCheck;
+
+        public DiViolationService(bool skipTestNamespaceCheck = false)
+        {
+            _skipTestNamespaceCheck = skipTestNamespaceCheck;
+        }
 
         public List<CodeReviewResult> Review(CompilationUnitSyntax root)
         {
@@ -146,6 +152,7 @@ namespace ReviewSharp.Services
 
         private bool IsInTestContext(ObjectCreationExpressionSyntax creation)
         {
+            if (_skipTestNamespaceCheck) return false;
             // Check if this is in a test class
             var containingClass = creation.Ancestors().OfType<ClassDeclarationSyntax>().FirstOrDefault();
             if (containingClass != null)
