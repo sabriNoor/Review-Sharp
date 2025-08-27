@@ -232,7 +232,7 @@ namespace ReviewSharp.Services
                     {
                         RuleName = "Interface Naming Convention",
                         Message = $"Interface '{ifaceName}' should be PascalCase and start with 'I'.",
-                        Severity = "Error",
+                        Severity = "Warning",
                         LineNumber = iface.GetLocation().GetLineSpan().StartLinePosition.Line + 1
                     });
                 }
