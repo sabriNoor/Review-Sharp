@@ -22,6 +22,7 @@ builder.Services.AddScoped<ICodeReviewService, StringConcatInLoopService>();
 builder.Services.AddScoped<ICodeReviewService, AsyncMethodBestPracticesService>();
 builder.Services.AddScoped<ICodeReviewService, ClassAndMethodLengthService>();
 builder.Services.AddScoped<ICodeReviewService, LinqInsufficientCheckService>();
+builder.Services.AddScoped<ICodeReviewService, ManyMethodParametersService>();
 
 
 var app = builder.Build();
