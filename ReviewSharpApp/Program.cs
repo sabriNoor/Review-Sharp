@@ -24,6 +24,7 @@ builder.Services.AddScoped<ICodeReviewService, ClassAndMethodLengthService>();
 builder.Services.AddScoped<ICodeReviewService, LinqInsufficientCheckService>();
 builder.Services.AddScoped<ICodeReviewService, ManyMethodParametersService>();
 builder.Services.AddScoped<ICodeReviewService, EmptyFinallyBlockService>();
+builder.Services.AddScoped<ICodeReviewService, DefaultSwitchCaseMissingService>();
 
 
 var app = builder.Build();
