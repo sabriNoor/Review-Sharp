@@ -15,8 +15,17 @@ namespace ReviewSharp.Services
             var results = new List<CodeReviewResult>();
             if (root == null) return results;
 
+            var ignoredKinds = new[]
+            {
+                SyntaxKind.TrueLiteralExpression,
+                SyntaxKind.FalseLiteralExpression,
+                SyntaxKind.NullLiteralExpression,
+                SyntaxKind.DefaultLiteralExpression
+            };
+
             var literalGroups = root.DescendantNodes()
                 .OfType<LiteralExpressionSyntax>()
+                .Where(l => !ignoredKinds.Contains(l.Kind()))
                 .GroupBy(l => l.Token.ValueText)
                 .Where(g => g.Count() > 1 && !string.IsNullOrWhiteSpace(g.Key));
 
