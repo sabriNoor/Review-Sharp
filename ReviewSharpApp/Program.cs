@@ -27,6 +27,8 @@ builder.Services.AddScoped<ICodeReviewService, EmptyFinallyBlockService>();
 builder.Services.AddScoped<ICodeReviewService, DefaultSwitchCaseMissingService>();
 builder.Services.AddScoped<ICodeReviewService, PossibleNullReferenceService>();
 builder.Services.AddScoped<ICodeReviewService, DuplicateLiteralService>();
+builder.Services.AddScoped<ICodeReviewService, UnreachableCodeService>();
+
 
 
 var app = builder.Build();
