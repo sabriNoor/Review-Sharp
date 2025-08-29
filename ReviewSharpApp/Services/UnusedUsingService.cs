@@ -21,10 +21,13 @@ namespace ReviewSharp.Services
                 var name = usingDirective.Name?.ToString();
 
                 // Check if the namespace is referenced anywhere in the code
-                bool isUsed = root.DescendantNodes()
-                                  .OfType<IdentifierNameSyntax>()
-                                  .Any(id => semanticModel.GetSymbolInfo(id).Symbol?.ContainingNamespace?.ToDisplayString() == name);
-
+                 bool isUsed = root.DescendantNodes()
+                          .OfType<SyntaxNode>() 
+                          .Any(node =>
+                          {
+                              var symbol = semanticModel.GetSymbolInfo(node).Symbol;
+                              return symbol != null && symbol.ContainingNamespace?.ToDisplayString() == name;
+                          });
                 if (!isUsed)
                 {
                     results.Add(new CodeReviewResult
