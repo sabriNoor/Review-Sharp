@@ -4,18 +4,24 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Threading.Tasks;
 using ReviewSharp.Interfaces;
+using Microsoft.CodeAnalysis;
 
 namespace ReviewSharp.Services
 {
     public class CodeParserService : ICodeParserService
     {
-        public async Task<CompilationUnitSyntax> ParseAsync(IFormFile file)
+        public async Task<Compilation> ParseAsync(IFormFile file)
         {
             using (var reader = new StreamReader(file.OpenReadStream()))
             {
                 var code = await reader.ReadToEndAsync();
-                var tree = CSharpSyntaxTree.ParseText(code);
-                return (CompilationUnitSyntax)tree.GetRoot();
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("CodeAnalysis")
+                    .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
+                    .AddSyntaxTrees(syntaxTree);
+
+                return compilation;
+
             }
         }
     }

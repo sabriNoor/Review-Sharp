@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ReviewSharp.Interfaces;
 using System.Collections.Generic;
 using System.IO;
@@ -10,25 +12,33 @@ namespace ReviewSharp.Services
     {
         private readonly ICodeParserService _parserService;
         private readonly IEnumerable<ICodeReviewService> _reviewServices;
+        private readonly IEnumerable<ICodeReviewSemanticService> _semanticReviewServices;
 
-        public CodeReviewOrchestratorService(ICodeParserService parserService, IEnumerable<ICodeReviewService> reviewServices)
+        public CodeReviewOrchestratorService(
+            ICodeParserService parserService,
+            IEnumerable<ICodeReviewService> reviewServices,
+            IEnumerable<ICodeReviewSemanticService> semanticReviewServices)
         {
             _parserService = parserService;
             _reviewServices = reviewServices;
+            _semanticReviewServices = semanticReviewServices;
         }
 
         public async Task<List<Models.CodeReviewResult>> ReviewAsync(IFormFile file)
         {
-            var root = await _parserService.ParseAsync(file);
+            var compilation = await _parserService.ParseAsync(file);
+            var syntaxTree = compilation.SyntaxTrees.First();
+            var root = (CompilationUnitSyntax)await syntaxTree.GetRootAsync();
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var results = new List<Models.CodeReviewResult>();
 
             foreach (var service in _reviewServices)
             {
-                var serviceResults = service.Review(root);
-                if (serviceResults != null && serviceResults.Count > 0)
-                {
-                    results.AddRange(serviceResults);
-                }
+                results.AddRange(service.Review(root));
+            }
+            foreach (var service in _semanticReviewServices)
+            {
+                results.AddRange(service.Review(root, semanticModel));
             }
 
             return results;
