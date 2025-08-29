@@ -28,6 +28,7 @@ builder.Services.AddScoped<ICodeReviewService, DefaultSwitchCaseMissingService>(
 builder.Services.AddScoped<ICodeReviewService, PossibleNullReferenceService>();
 builder.Services.AddScoped<ICodeReviewService, DuplicateLiteralService>();
 builder.Services.AddScoped<ICodeReviewService, UnreachableCodeService>();
+builder.Services.AddScoped<ICodeReviewSemanticService, BoxingUnboxingService>();
 
 
 

@@ -12,4 +12,22 @@ public static class CodeParsing
         var root = tree.GetCompilationUnitRoot();
         return root;
     }
+
+    public static (CompilationUnitSyntax Root, SemanticModel Model) ParseAndGetSemanticModel(string source)
+    {
+        // Parse the syntax tree once
+        var tree = CSharpSyntaxTree.ParseText(source);
+        var root = tree.GetCompilationUnitRoot();
+
+        // Create a compilation with basic references
+        var compilation = CSharpCompilation.Create("TestAssembly")
+            .AddReferences(
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(System.Console).Assembly.Location)
+            )
+            .AddSyntaxTrees(tree);
+
+        var model = compilation.GetSemanticModel(tree);
+        return (root, model);
+    }
 }
