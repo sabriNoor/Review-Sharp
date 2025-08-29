@@ -31,6 +31,7 @@ builder.Services.AddScoped<ICodeReviewService, UnreachableCodeService>();
 builder.Services.AddScoped<ICodeReviewSemanticService, BoxingUnboxingService>();
 builder.Services.AddScoped<ICodeReviewSemanticService, BoxingUnboxingService>();
 builder.Services.AddScoped<ICodeReviewSemanticService, UnusedUsingService>();
+builder.Services.AddScoped<ICodeReviewService, FileNameMatchClassService>();
 
 
 var app = builder.Build();
