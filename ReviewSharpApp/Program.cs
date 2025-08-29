@@ -29,7 +29,8 @@ builder.Services.AddScoped<ICodeReviewService, PossibleNullReferenceService>();
 builder.Services.AddScoped<ICodeReviewService, DuplicateLiteralService>();
 builder.Services.AddScoped<ICodeReviewService, UnreachableCodeService>();
 builder.Services.AddScoped<ICodeReviewSemanticService, BoxingUnboxingService>();
-
+builder.Services.AddScoped<ICodeReviewSemanticService, BoxingUnboxingService>();
+builder.Services.AddScoped<ICodeReviewSemanticService, UnusedUsingService>();
 
 
 var app = builder.Build();
