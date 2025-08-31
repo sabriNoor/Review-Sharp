@@ -15,10 +15,10 @@ namespace ReviewSharp.Services
             var syntaxTree = root.SyntaxTree;
             var filePath = syntaxTree.FilePath;
             var fileName = Path.GetFileNameWithoutExtension(filePath);
-
+           
             // Only check top-level (non-nested) class declarations
-            var topLevelClasses = root.Members.OfType<ClassDeclarationSyntax>();
-            foreach (var classDecl in topLevelClasses)
+            var classDecls = root.DescendantNodes().OfType<ClassDeclarationSyntax>();
+            foreach (var classDecl in classDecls)
             {
                 var className = classDecl.Identifier.Text;
                 if (className != fileName)
@@ -26,7 +26,7 @@ namespace ReviewSharp.Services
                     results.Add(new CodeReviewResult
                     {
                         RuleName = "File Name Mismatch",
-                        Message = $"Class name '{className}' does not match file name '{fileName}'.",
+                        Message = $"Class name '{className}' does not match file name '{fileName}' (file path: '{filePath}').",
                         Severity = "Warning",
                         LineNumber = classDecl.Identifier.GetLocation().GetLineSpan().StartLinePosition.Line + 1
                     });
