@@ -5,7 +5,7 @@ using ReviewSharpApp.Tests.TestHelpers;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ReviewSharp.Tests
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class DuplicateCodeServiceTests
     {

@@ -4,7 +4,7 @@ using Xunit;
 using ReviewSharp.Services;
 using System.Linq;
 
-namespace ReviewSharp.Tests
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class NestedBlockDepthServiceTests
     {

@@ -5,7 +5,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using ReviewSharpApp.Tests.TestHelpers;
-namespace ReviewSharp.Tests
+
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class SyntaxCheckServiceTests
     {            

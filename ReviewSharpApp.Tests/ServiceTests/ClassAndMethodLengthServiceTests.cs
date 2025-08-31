@@ -4,7 +4,7 @@ using ReviewSharp.Models;
 using ReviewSharpApp.Tests.TestHelpers;
 using System.Collections.Generic;
 
-namespace ReviewSharp.Tests
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class ClassAndMethodLengthServiceTests
     {

@@ -4,7 +4,8 @@ using ReviewSharp.Models;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Linq;
 using ReviewSharpApp.Tests.TestHelpers;
-namespace ReviewSharp.Tests
+
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class UnusedSymbolServiceTests
     {
