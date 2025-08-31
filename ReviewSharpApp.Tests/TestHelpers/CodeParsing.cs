@@ -11,9 +11,9 @@ namespace ReviewSharpApp.Tests.TestHelpers
 {
     public static class CodeParsing
     {
-        public static CompilationUnitSyntax ParseCompilation(string source)
+        public static CompilationUnitSyntax ParseCompilation(string source, string filePath = "")
         {
-            var tree = CSharpSyntaxTree.ParseText(source);
+            var tree = CSharpSyntaxTree.ParseText(source,path: filePath);
             return tree.GetCompilationUnitRoot();
         }
         public static (CompilationUnitSyntax Root, SemanticModel Model) ParseAndGetSemanticModel(string source)
