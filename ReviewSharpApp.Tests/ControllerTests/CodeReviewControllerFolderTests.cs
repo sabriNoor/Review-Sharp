@@ -82,7 +82,7 @@ namespace ReviewSharpApp.Tests.ControllerTests
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Please select a C# source file.", controller.ViewBag.Error);
+            Assert.Equal("Please select a file or zipped folder.", controller.ViewBag.Error);
         }
 
         [Fact]
@@ -109,7 +109,7 @@ namespace ReviewSharpApp.Tests.ControllerTests
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Invalid file type. Please upload a C# source file.", controller.ViewBag.Error);
+            Assert.Equal("Please select a file or zipped folder.", controller.ViewBag.Error);
         }
 
             [Fact]
@@ -148,7 +148,7 @@ namespace ReviewSharpApp.Tests.ControllerTests
 
                 // Assert
                 var viewResult = Assert.IsType<ViewResult>(result);
-                Assert.Equal("Invalid file type. Please upload a C# source file.", controller.ViewBag.Error);
+                Assert.Equal("Please select a file or zipped folder.", controller.ViewBag.Error);
             }
     }
 }

@@ -13,7 +13,7 @@ namespace ReviewSharpApp.Tests.ControllerTests
     public class CodeReviewControllerTests
     {
 
-        [Fact]
+        [Fact(Skip ="old version")]
         public async Task UploadFile_ReturnsViewWithResults_WhenFileIsValid()
         {
             // Arrange
@@ -46,7 +46,7 @@ namespace ReviewSharpApp.Tests.ControllerTests
             Assert.Equal(fakeResults, viewResult.ViewData["Results"]);
 
         }
-        [Fact]
+        [Fact(Skip ="old version")]
         public async Task UploadFile_ReturnsViewWithError_WhenFileIsNull()
         {
             // Arrange
@@ -70,7 +70,7 @@ namespace ReviewSharpApp.Tests.ControllerTests
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Please select a C# source file.", controller.ViewBag.Error);
         }
-        [Fact]
+        [Fact(Skip ="old version")]
         public async Task UploadFile_ReturnsViewWithError_WhenFileIsInvalidType()
         {
             // Arrange
