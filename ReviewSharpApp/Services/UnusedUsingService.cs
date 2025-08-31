@@ -16,18 +16,29 @@ namespace ReviewSharp.Services
             // Iterate over all using directives
             foreach (var usingDirective in root.Usings)
             {
-                if(usingDirective.StaticKeyword != default || usingDirective.Alias != null)
+                if (usingDirective.StaticKeyword != default || usingDirective.Alias != null)
                     continue;
                 var name = usingDirective.Name?.ToString();
 
                 // Check if the namespace is referenced anywhere in the code
-                 bool isUsed = root.DescendantNodes()
-                          .OfType<SyntaxNode>() 
-                          .Any(node =>
-                          {
-                              var symbol = semanticModel.GetSymbolInfo(node).Symbol;
-                              return symbol != null && symbol.ContainingNamespace?.ToDisplayString() == name;
-                          });
+                bool isUsed = root.DescendantNodes()
+                    .Where(node =>
+                        node is IdentifierNameSyntax ||
+                        node is QualifiedNameSyntax ||
+                        node is GenericNameSyntax ||
+                        node is ObjectCreationExpressionSyntax ||
+                        node is AttributeSyntax)
+                    .Any(node =>
+                    {
+                        var symbol = semanticModel.GetSymbolInfo(node).Symbol;
+                        if (symbol is ITypeSymbol typeSymbol)
+                        {
+                            var ns = typeSymbol.ContainingNamespace?.ToDisplayString();
+                            return ns != null && (ns == name || ns.StartsWith(name + "."));
+                        }
+                        var ns2 = symbol?.ContainingNamespace?.ToDisplayString();
+                        return ns2 != null && (ns2 == name || ns2.StartsWith(name + "."));
+                    });
                 if (!isUsed)
                 {
                     results.Add(new CodeReviewResult
