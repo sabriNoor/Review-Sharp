@@ -98,25 +98,34 @@ namespace ReviewSharp.Controllers
         [HttpGet]
         public IActionResult ShowFileResult(string fileName)
         {
-            // Deserialize from Session
-            var resultsByFileJson = HttpContext.Session.GetString("ResultsByFile");
-            var fileCodesJson = HttpContext.Session.GetString("FileCodes");
-            if (string.IsNullOrEmpty(resultsByFileJson) || string.IsNullOrEmpty(fileCodesJson))
+            try
             {
-                TempData["Error"] = "File not found in review results.";
+                // Deserialize from Session
+                var resultsByFileJson = HttpContext.Session.GetString("ResultsByFile");
+                var fileCodesJson = HttpContext.Session.GetString("FileCodes");
+                if (string.IsNullOrEmpty(resultsByFileJson) || string.IsNullOrEmpty(fileCodesJson))
+                {
+                    TempData["Error"] = "File not found in review results.";
+                    return RedirectToAction("ResultFolder");
+                }
+                var resultsByFile = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, List<CodeReviewResult>>>(resultsByFileJson);
+                var fileCodes = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(fileCodesJson);
+                if (resultsByFile == null || fileCodes == null || !resultsByFile.ContainsKey(fileName) || !fileCodes.ContainsKey(fileName))
+                {
+                    TempData["Error"] = "File not found in review results.";
+                    return RedirectToAction("ResultFolder");
+                }
+                ViewBag.Results = resultsByFile[fileName];
+                ViewBag.Code = fileCodes[fileName];
+                ViewBag.FileName = fileName;
+                return View("Result");
+            }
+            catch (Exception)
+            {
+                // Log the exception (not implemented here)
+                TempData["Error"] = "An error occurred while retrieving the file results.";
                 return RedirectToAction("ResultFolder");
             }
-            var resultsByFile = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, List<CodeReviewResult>>>(resultsByFileJson);
-            var fileCodes = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(fileCodesJson);
-            if (resultsByFile == null || fileCodes == null || !resultsByFile.ContainsKey(fileName) || !fileCodes.ContainsKey(fileName))
-            {
-                TempData["Error"] = "File not found in review results.";
-                return RedirectToAction("ResultFolder");
-            }
-            ViewBag.Results = resultsByFile[fileName];
-            ViewBag.Code = fileCodes[fileName];
-            ViewBag.FileName = fileName;
-            return View("Result");
         }
 
 
