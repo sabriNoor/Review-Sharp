@@ -16,11 +16,11 @@ namespace ReviewSharp.Services
             var filePath = syntaxTree.FilePath;
             var fileName = Path.GetFileNameWithoutExtension(filePath);
 
-            // Iterate over all class declarations
-            foreach (var classDecl in root.DescendantNodes().OfType<ClassDeclarationSyntax>())
+            // Only check top-level (non-nested) class declarations
+            var topLevelClasses = root.Members.OfType<ClassDeclarationSyntax>();
+            foreach (var classDecl in topLevelClasses)
             {
                 var className = classDecl.Identifier.Text;
-
                 if (className != fileName)
                 {
                     results.Add(new CodeReviewResult
