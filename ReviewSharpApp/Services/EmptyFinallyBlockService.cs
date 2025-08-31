@@ -11,11 +11,7 @@ namespace ReviewSharp.Services
         public List<CodeReviewResult> Review(CompilationUnitSyntax root)
         {
             var results = new List<CodeReviewResult>();
-            if (root == null)
-            {
-                return results;
-            }
-
+        
             var finallyClauses = root.DescendantNodes().OfType<FinallyClauseSyntax>().ToList();
             foreach (var finallyClause in finallyClauses)
             {

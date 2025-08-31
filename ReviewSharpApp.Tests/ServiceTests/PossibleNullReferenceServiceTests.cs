@@ -127,12 +127,6 @@ namespace ReviewSharpApp.Tests.ServiceTests
             Assert.DoesNotContain(results, r => r.Message.Contains("Possible null reference on 'p'"));
         }
 
-        [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var service = new PossibleNullReferenceService();
-            var results = service.Review(null);
-            Assert.Empty(results);
-        }
+    
     }
 }

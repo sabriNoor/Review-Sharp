@@ -32,14 +32,6 @@ namespace ReviewSharpApp.Tests.ServiceTests
         }
 
         [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var service = new EmptyCatchService();
-            var results = service.Review(null);
-            Assert.Empty(results);
-        }
-
-        [Fact]
         public void Review_CatchWithHandling_NoWarning()
         {
             var code = "class C { void M() { try { } catch (Exception ex) { Console.WriteLine(ex); } } }";

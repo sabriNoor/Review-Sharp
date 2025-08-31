@@ -36,12 +36,6 @@ namespace ReviewSharpApp.Tests.ServiceTests
             Assert.Contains(results, r => r.RuleName == "SyntaxCheck" && r.Severity == "Error");
         }
 
-        [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var results = new SyntaxCheckService().Review(null);
-            Assert.Empty(results);
-        }
 
         [Fact]
         public void Review_MissingSemicolon_ReturnsError()

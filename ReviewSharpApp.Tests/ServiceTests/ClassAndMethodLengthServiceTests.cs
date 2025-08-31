@@ -52,12 +52,5 @@ namespace ReviewSharpApp.Tests.ServiceTests
             Assert.Contains(results, r => r.Message.Contains("Method 'M' is 51 lines long"));
         }
 
-        [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var service = new ClassAndMethodLengthService();
-            var results = service.Review(null);
-            Assert.Empty(results);
-        }
     }
 }

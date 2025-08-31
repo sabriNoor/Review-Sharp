@@ -95,12 +95,6 @@ namespace ReviewSharpApp.Tests.ServiceTests
             Assert.Empty(results);
         }
 
-        [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var service = new StringConcatInLoopService();
-            var results = service.Review(null);
-            Assert.Empty(results);
-        }
+    
     }
 }

@@ -28,13 +28,6 @@ namespace ReviewSharpApp.Tests.ServiceTests
 				Assert.DoesNotContain(results, r => r.Message.Contains("switch statement"));
 		}
 
-		[Fact]
-		public void Review_NullRoot_ReturnsEmpty()
-		{
-			var service = new SwitchStatementService();
-			var results = service.Review(null);
-			Assert.Empty(results);
-		}
 
 		[Fact]
 		public void Review_NoIfElseChains_NoSuggestion()

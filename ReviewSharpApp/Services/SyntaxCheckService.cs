@@ -12,11 +12,6 @@ namespace ReviewSharp.Services
         {
             var results = new List<CodeReviewResult>();
 
-            if (root == null)
-            {
-                return results;
-            }
-
             var syntaxTree = root.SyntaxTree;
             if (syntaxTree == null)
             {

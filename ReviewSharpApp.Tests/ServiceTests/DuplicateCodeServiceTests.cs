@@ -77,14 +77,6 @@ namespace ReviewSharpApp.Tests.ServiceTests
         }
 
         [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var service = new DuplicateCodeService();
-            var results = service.Review(null);
-            Assert.Empty(results);
-        }
-
-        [Fact]
         public void Review_DuplicateWithDifferentAccessModifiers_DetectsDuplicate()
         {
             var code = @"class C { public void M1() { int x = 1; } private void M2() { int x = 1; } }";

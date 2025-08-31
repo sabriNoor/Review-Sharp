@@ -16,10 +16,6 @@ namespace ReviewSharp.Services
         public List<CodeReviewResult> Review(CompilationUnitSyntax root)
         {
             var results = new List<CodeReviewResult>();
-            if (root == null)
-            {
-                return results;
-            }
 
             var methodNodes = root.DescendantNodes().OfType<MethodDeclarationSyntax>().ToList();
             var localFunctionNodes = root.DescendantNodes().OfType<LocalFunctionStatementSyntax>().ToList();

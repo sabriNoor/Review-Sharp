@@ -49,12 +49,6 @@ namespace ReviewSharpApp.Tests.ServiceTests
             Assert.All(results, r => Assert.Contains("Empty finally block detected", r.Message));
         }
 
-        [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var service = new EmptyFinallyBlockService();
-            var results = service.Review(null);
-            Assert.Empty(results);
-        }
+    
     }
 }
