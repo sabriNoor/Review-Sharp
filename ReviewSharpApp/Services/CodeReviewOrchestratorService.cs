@@ -90,7 +90,7 @@ namespace ReviewSharp.Services
                 var fileName = Path.GetRelativePath(tempExtractDir, filePath);
                 if (IsNonReviewable(filePath, fileName)) continue;
                 var code = await File.ReadAllTextAsync(filePath);
-                var syntaxTree = Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(code);
+                var syntaxTree = Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(code, new Microsoft.CodeAnalysis.CSharp.CSharpParseOptions(), filePath);
                 var compilation = Microsoft.CodeAnalysis.CSharp.CSharpCompilation.Create("CodeAnalysis")
                     .AddSyntaxTrees(syntaxTree)
                     .WithOptions(new Microsoft.CodeAnalysis.CSharp.CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary));

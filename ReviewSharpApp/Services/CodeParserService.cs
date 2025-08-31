@@ -16,7 +16,8 @@ namespace ReviewSharp.Services
         {
             using var reader = new StreamReader(file.OpenReadStream());
             var code = await reader.ReadToEndAsync();
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var path = file.FileName;
+            var syntaxTree = CSharpSyntaxTree.ParseText(code, new CSharpParseOptions(), path);
 
             var coreDir = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
             var references = new List<MetadataReference>

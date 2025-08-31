@@ -2,7 +2,7 @@ using ReviewSharp.Models;
 using ReviewSharp.Services;
 using ReviewSharpApp.Tests.TestHelpers;
 
-namespace ReviewSharpApp.Tests.ServiceTests
+namespace ReviewSharpApp.Tests
 {
     public class FileNameMatchClassServiceTests
     {
