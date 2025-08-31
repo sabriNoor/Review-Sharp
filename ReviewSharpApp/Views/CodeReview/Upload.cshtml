@@ -31,14 +31,17 @@
                     <p class="text-muted mb-3">Upload a single <code>.cs</code> file <b>or</b> a <code>.zip</code>
                         folder containing multiple files and subfolders.</p>
                     <input id="fileInput" type="file" name="file" accept=".cs,.zip" required class="d-none" />
-                    <button type="button" id="browseBtn" class="btn btn-outline-primary px-4 rounded-pill">Browse Files
-                        or Folder</button>
+                    <button type="button" id="browseBtn" class="btn btn-outline-primary px-4 rounded-pill">
+                        Browse Files or Folder
+                    </button>
                     <div id="fileName" class="text-secondary mt-3"></div>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary mt-4 px-5 py-2 rounded-pill fw-semibold">
-                    Upload & Review
+                <button type="submit" id="submitBtn" class="btn btn-primary mt-4 px-5 py-2 rounded-pill fw-semibold">
+                    <span id="btnText">Upload & Review</span>
+                    <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"
+                        aria-hidden="true"></span>
                 </button>
 
                 <noscript>
@@ -64,6 +67,10 @@
             const input = document.getElementById('fileInput');
             const browse = document.getElementById('browseBtn');
             const fileName = document.getElementById('fileName');
+            const form = document.getElementById('uploadForm');
+            const btn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
 
             function setFileFromList(fileList) {
                 try {
@@ -104,6 +111,18 @@
                     fileName.textContent = input.files[0].name;
                     fileName.classList.remove("text-danger");
                 }
+            });
+
+            // When form is submitted => disable everything
+            form.addEventListener('submit', () => {
+                btn.disabled = true;
+                btnText.textContent = "Uploading...";
+                btnSpinner.classList.remove("d-none");
+
+                // Disable browse button + dropzone
+                browse.disabled = true;
+                dz.style.pointerEvents = "none";
+                dz.style.opacity = "0.6";
             });
         })();
     </script>
