@@ -7,7 +7,7 @@ using System.Linq;
 using Xunit;
 using ReviewSharpApp.Tests.TestHelpers;
 
-namespace ReviewSharp.Tests
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class AsyncMethodBestPracticesServiceTests
     {

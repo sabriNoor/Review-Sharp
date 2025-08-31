@@ -4,7 +4,7 @@ using ReviewSharp.Models;
 using ReviewSharpApp.Tests.TestHelpers;
 using System.Collections.Generic;
 
-namespace ReviewSharp.Tests
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class ClassAndMethodLengthServiceTests
     {
@@ -52,12 +52,5 @@ namespace ReviewSharp.Tests
             Assert.Contains(results, r => r.Message.Contains("Method 'M' is 51 lines long"));
         }
 
-        [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var service = new ClassAndMethodLengthService();
-            var results = service.Review(null);
-            Assert.Empty(results);
-        }
     }
 }

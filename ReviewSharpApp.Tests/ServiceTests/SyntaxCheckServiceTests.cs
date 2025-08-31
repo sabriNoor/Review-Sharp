@@ -5,7 +5,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using ReviewSharpApp.Tests.TestHelpers;
-namespace ReviewSharp.Tests
+
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class SyntaxCheckServiceTests
     {            
@@ -35,12 +36,6 @@ namespace ReviewSharp.Tests
             Assert.Contains(results, r => r.RuleName == "SyntaxCheck" && r.Severity == "Error");
         }
 
-        [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var results = new SyntaxCheckService().Review(null);
-            Assert.Empty(results);
-        }
 
         [Fact]
         public void Review_MissingSemicolon_ReturnsError()

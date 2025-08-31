@@ -31,6 +31,10 @@ namespace ReviewSharp.Services
             var root = (CompilationUnitSyntax)await syntaxTree.GetRootAsync();
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var results = new List<Models.CodeReviewResult>();
+            if(root == null)
+            {
+                return results;
+            }
 
             foreach (var service in _reviewServices)
             {

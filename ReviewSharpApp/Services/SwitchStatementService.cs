@@ -12,11 +12,7 @@ namespace ReviewSharp.Services
         public List<CodeReviewResult> Review(CompilationUnitSyntax root)
         {
             var results = new List<CodeReviewResult>();
-            if (root == null)
-            {
-                return results;
-            }
-
+          
             var ifStatements = root.DescendantNodes().OfType<IfStatementSyntax>().ToList();
             foreach (var ifStatement in ifStatements)
             {

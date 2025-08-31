@@ -4,7 +4,7 @@ using ReviewSharp.Models;
 using ReviewSharpApp.Tests.TestHelpers;
 using System.Collections.Generic;
 
-namespace ReviewSharp.Tests
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class ManyMethodParametersServiceTests
     {
@@ -49,12 +49,5 @@ namespace ReviewSharp.Tests
             Assert.Empty(results);
         }
 
-        [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var service = new ManyMethodParametersService();
-            var results = service.Review(null);
-            Assert.Empty(results);
-        }
     }
 }

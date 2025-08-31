@@ -4,7 +4,8 @@ using ReviewSharp.Models;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Linq;
 using ReviewSharpApp.Tests.TestHelpers;
-namespace ReviewSharp.Tests
+
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class UnusedSymbolServiceTests
     {
@@ -22,7 +23,7 @@ namespace ReviewSharp.Tests
         [Theory]
         [InlineData("class C { private int x; }", "Private field 'x' is declared but never used.")]
         [InlineData("class C { private int x; void M() { int y = x; } }", null)]
-        public void Review_PrivateFieldUsage_WarnsIfUnused(string code, string expectedMessage)
+        public void Review_PrivateFieldUsage_WarnsIfUnused(string code, string? expectedMessage)
         {
             var results = GetResults(code);
             if (expectedMessage == null)
@@ -34,7 +35,7 @@ namespace ReviewSharp.Tests
         [Theory]
         [InlineData("class C { void M(int a) { } }", "Parameter 'a' is never used within the method.")]
         [InlineData("class C { void M(int a) { int x = a; } }", null)]
-        public void Review_MethodParameterUsage_WarnsIfUnused(string code, string expectedMessage)
+        public void Review_MethodParameterUsage_WarnsIfUnused(string code, string? expectedMessage)
         {
             var results = GetResults(code);
             if (expectedMessage == null)
@@ -46,7 +47,7 @@ namespace ReviewSharp.Tests
         [Theory]
         [InlineData("class C { void M() { int x; } }", "Local variable 'x' is declared but never used.")]
         [InlineData("class C { void M() { int x = 1; Console.WriteLine(x); } }", null)]
-        public void Review_LocalVariableUsage_WarnsIfUnused(string code, string expectedMessage)
+        public void Review_LocalVariableUsage_WarnsIfUnused(string code, string? expectedMessage)
         {
             var results = GetResults(code);
             if (expectedMessage == null)
@@ -58,7 +59,7 @@ namespace ReviewSharp.Tests
         [Theory]
         [InlineData("class C { void M() { void Local(int a) { } Local(1); } }", "Parameter 'a' is never used within the local function.")]
         [InlineData("class C { void M() { void Local(int a) { int x = a; } Local(1); } }", null)]
-        public void Review_LocalFunctionParameterUsage_WarnsIfUnused(string code, string expectedMessage)
+        public void Review_LocalFunctionParameterUsage_WarnsIfUnused(string code, string? expectedMessage)
         {
             var results = GetResults(code);
             if (expectedMessage == null)

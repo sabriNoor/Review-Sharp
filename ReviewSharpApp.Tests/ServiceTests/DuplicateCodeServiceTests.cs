@@ -5,7 +5,7 @@ using ReviewSharpApp.Tests.TestHelpers;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ReviewSharp.Tests
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class DuplicateCodeServiceTests
     {
@@ -74,14 +74,6 @@ namespace ReviewSharp.Tests
             var results = GetResults(code);
             Assert.Equal(2, results.Count);
             Assert.All(results, r => Assert.Contains("Duplicate code detected", r.Message));
-        }
-
-        [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var service = new DuplicateCodeService();
-            var results = service.Review(null);
-            Assert.Empty(results);
         }
 
         [Fact]

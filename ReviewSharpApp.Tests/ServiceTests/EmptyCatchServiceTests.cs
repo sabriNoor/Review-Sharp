@@ -4,7 +4,7 @@ using ReviewSharp.Models;
 using ReviewSharpApp.Tests.TestHelpers;
 using System.Collections.Generic;
 
-namespace ReviewSharp.Tests
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class EmptyCatchServiceTests
     {
@@ -29,14 +29,6 @@ namespace ReviewSharp.Tests
                 Assert.Contains(results, r => r.Message.Contains("Empty catch block"));
             else
                 Assert.DoesNotContain(results, r => r.Message.Contains("Empty catch block"));
-        }
-
-        [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var service = new EmptyCatchService();
-            var results = service.Review(null);
-            Assert.Empty(results);
         }
 
         [Fact]

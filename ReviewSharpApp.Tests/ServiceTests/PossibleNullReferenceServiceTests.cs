@@ -4,7 +4,7 @@ using ReviewSharp.Models;
 using ReviewSharpApp.Tests.TestHelpers;
 using System.Collections.Generic;
 
-namespace ReviewSharp.Tests
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class PossibleNullReferenceServiceTests
     {
@@ -127,12 +127,6 @@ namespace ReviewSharp.Tests
             Assert.DoesNotContain(results, r => r.Message.Contains("Possible null reference on 'p'"));
         }
 
-        [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var service = new PossibleNullReferenceService();
-            var results = service.Review(null);
-            Assert.Empty(results);
-        }
+    
     }
 }

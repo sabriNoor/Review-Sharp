@@ -12,10 +12,6 @@ namespace ReviewSharp.Services
         public List<CodeReviewResult> Review(CompilationUnitSyntax root)
         {
             var results = new List<CodeReviewResult>();
-            if (root == null)
-            {
-                return results;
-            }
 
             AnalyzeUnusedPrivateFields(root, results);
             AnalyzeUnusedMethodSymbols(root, results);

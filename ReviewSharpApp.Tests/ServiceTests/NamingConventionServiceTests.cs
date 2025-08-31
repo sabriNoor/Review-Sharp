@@ -6,7 +6,7 @@ using ReviewSharp.Services;
 using ReviewSharpApp.Tests.TestHelpers;
 using Xunit;
 
-namespace ReviewSharpApp.Tests
+namespace ReviewSharpApp.Tests.ServiceTests
 {
 
     public class NamingConventionServiceTests

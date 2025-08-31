@@ -15,11 +15,6 @@ namespace ReviewSharp.Services
         public List<CodeReviewResult> Review(CompilationUnitSyntax root)
         {
             var results = new List<CodeReviewResult>();
-            if (root == null)
-            {
-                return results;
-            }
-
             // Check classes
             foreach (var classDecl in root.DescendantNodes().OfType<ClassDeclarationSyntax>())
             {

@@ -4,7 +4,7 @@ using ReviewSharp.Models;
 using ReviewSharpApp.Tests.TestHelpers;
 using System.Collections.Generic;
 
-namespace ReviewSharp.Tests
+namespace ReviewSharpApp.Tests.ServiceTests
 {
 	public class SwitchStatementServiceTests
 	{
@@ -28,13 +28,6 @@ namespace ReviewSharp.Tests
 				Assert.DoesNotContain(results, r => r.Message.Contains("switch statement"));
 		}
 
-		[Fact]
-		public void Review_NullRoot_ReturnsEmpty()
-		{
-			var service = new SwitchStatementService();
-			var results = service.Review(null);
-			Assert.Empty(results);
-		}
 
 		[Fact]
 		public void Review_NoIfElseChains_NoSuggestion()

@@ -4,7 +4,7 @@ using ReviewSharp.Models;
 using ReviewSharpApp.Tests.TestHelpers;
 using System.Collections.Generic;
 
-namespace ReviewSharp.Tests
+namespace ReviewSharpApp.Tests.ServiceTests
 {
     public class DefaultSwitchCaseMissingServiceTests
     {
@@ -50,12 +50,6 @@ namespace ReviewSharp.Tests
             Assert.Contains("missing a default case", results[0].Message);
         }
 
-        [Fact]
-        public void Review_NullRoot_ReturnsEmpty()
-        {
-            var service = new DefaultSwitchCaseMissingService();
-            var results = service.Review(null);
-            Assert.Empty(results);
-        }
+      
     }
 }
