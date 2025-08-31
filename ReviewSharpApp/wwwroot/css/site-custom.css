@@ -1,0 +1,78 @@
+/* Custom dark mode and toggle styles moved from Result.cshtml */
+.dark-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 2rem;
+  background: linear-gradient(90deg, #23272b 60%, #3fa9f5 100%);
+  color: #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+  outline: none;
+}
+.dark-toggle-btn:hover,
+.dark-toggle-btn:focus {
+  background: linear-gradient(90deg, #3fa9f5 0%, #23272b 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(63, 169, 245, 0.15);
+}
+.dark-mode .dark-toggle-btn {
+  background: linear-gradient(90deg, #23272b 60%, #ffd166 100%);
+  color: #ffd166;
+}
+.dark-mode .dark-toggle-btn:hover,
+.dark-mode .dark-toggle-btn:focus {
+  background: linear-gradient(90deg, #ffd166 0%, #23272b 100%);
+  color: #23272b;
+}
+body.dark-mode {
+  background-color: #181a1b !important;
+  color: #e0e0e0 !important;
+}
+.dark-mode .card,
+.dark-mode .card-header,
+.dark-mode .card-body {
+  background-color: #23272b !important;
+  color: #e0e0e0 !important;
+}
+.dark-mode table {
+  background-color: #23272b !important;
+  color: #e0e0e0 !important;
+  border: none !important;
+}
+.dark-mode th,
+.dark-mode td {
+  background-color: #23272b !important;
+  color: #e0e0e0 !important;
+  border: none !important;
+}
+.dark-mode tr:nth-child(even) {
+  background-color: #202225 !important;
+}
+.dark-mode pre,
+.dark-mode code {
+  background: #22272e !important;
+  color: #d1d5da !important;
+}
+.dark-mode .badge.bg-danger {
+  background-color: #ff6b6b !important;
+  color: #fff !important;
+}
+.dark-mode .badge.bg-warning {
+  background-color: #ffd166 !important;
+  color: #222 !important;
+}
+.dark-mode .badge.bg-info {
+  background-color: #3fa9f5 !important;
+  color: #fff !important;
+}
+.dark-mode .alert-success {
+  background-color: #223322 !important;
+  color: #b6fcb6 !important;
+  border-color: #2e4d2e !important;
+}
