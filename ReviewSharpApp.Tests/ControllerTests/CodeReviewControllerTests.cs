@@ -27,7 +27,8 @@ namespace ReviewSharpApp.Tests.ControllerTests
                 { "File2.cs", new List<CodeReviewResult> { new CodeReviewResult { RuleName = "Test", Message = "File2.cs reviewed", Severity = "Warning", LineNumber = 2 } } }
             };
             mockOrchestrator.Setup(o => o.ReviewFolderAsync(It.IsAny<IFormFile>())).ReturnsAsync(fakeResultsByFile);
-            var controller = new CodeReviewController(mockOrchestrator.Object);
+            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
+            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
 
             // Create a zip file in memory containing .cs files
             var zipStream = new MemoryStream();
@@ -73,7 +74,8 @@ namespace ReviewSharpApp.Tests.ControllerTests
             var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
             var fakeResults = new List<CodeReviewResult> { new CodeReviewResult { RuleName = "Test", Message = "Test message", Severity = "Warning", LineNumber = 1 } };
             mockOrchestrator.Setup(o => o.ReviewAsync(It.IsAny<IFormFile>())).ReturnsAsync(fakeResults);
-            var controller = new CodeReviewController(mockOrchestrator.Object);
+            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
+            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
 
             var mockFile = new Mock<IFormFile>();
             mockFile.Setup(f => f.Length).Returns(1);
@@ -104,7 +106,8 @@ namespace ReviewSharpApp.Tests.ControllerTests
         {
             // Arrange
             var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
-            var controller = new CodeReviewController(mockOrchestrator.Object);
+            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
+            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
 
            var mockFile = new Mock<IFormFile>();
             mockFile.Setup(f => f.Length).Returns(1);
@@ -131,7 +134,8 @@ namespace ReviewSharpApp.Tests.ControllerTests
         {
             // Arrange
             var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
-            var controller = new CodeReviewController(mockOrchestrator.Object);
+            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
+            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
 
             var mockFiles = new FormFileCollection();
             var mockForm = new Mock<IFormCollection>();
@@ -153,7 +157,8 @@ namespace ReviewSharpApp.Tests.ControllerTests
         {
             // Arrange
             var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
-            var controller = new CodeReviewController(mockOrchestrator.Object);
+            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
+            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
 
             var mockFiles = new FormFileCollection();
             var mockForm = new Mock<IFormCollection>();
@@ -175,7 +180,8 @@ namespace ReviewSharpApp.Tests.ControllerTests
         {
             // Arrange
             var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
-            var controller = new CodeReviewController(mockOrchestrator.Object);
+            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
+            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
 
             var file1 = new Mock<IFormFile>();
             file1.Setup(f => f.Length).Returns(100);
@@ -202,7 +208,8 @@ namespace ReviewSharpApp.Tests.ControllerTests
         {
             // Arrange
             var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
-            var controller = new CodeReviewController(mockOrchestrator.Object);
+            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
+            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
 
             // Create a zip file in memory containing only .txt files
             var zipStream = new MemoryStream();
@@ -241,7 +248,8 @@ namespace ReviewSharpApp.Tests.ControllerTests
         {
             // Arrange
             var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
-            var controller = new CodeReviewController(mockOrchestrator.Object);
+            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
+            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
 
             var fileName = "TestFile.cs";
             var resultsByFile = new Dictionary<string, List<CodeReviewResult>>

@@ -40,6 +40,7 @@ builder.Services.AddScoped<ICodeReviewSemanticService, BoxingUnboxingService>();
 builder.Services.AddScoped<ICodeReviewSemanticService, UnusedUsingService>();
 builder.Services.AddScoped<ICodeReviewService, FileNameMatchClassService>();
 builder.Services.AddScoped<ICodeReviewService, NestedBlockDepthService>();
+builder.Services.AddScoped<IFileProcessingService, FileProcessingService>();
 
 
 var app = builder.Build();

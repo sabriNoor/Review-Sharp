@@ -14,11 +14,14 @@ namespace ReviewSharp.Controllers
 {
     public class CodeReviewController : Controller
     {
-        private readonly ICodeReviewOrchestratorService _orchestratorService;
+    private readonly ICodeReviewOrchestratorService _orchestratorService;
+    private readonly IFileProcessingService _fileProcessingService;
 
-        public CodeReviewController(ICodeReviewOrchestratorService orchestratorService)
+        public CodeReviewController(ICodeReviewOrchestratorService orchestratorService
+        , IFileProcessingService fileProcessingService)
         {
             _orchestratorService = orchestratorService;
+            _fileProcessingService = fileProcessingService;
         }
 
         [HttpGet]
@@ -32,7 +35,7 @@ namespace ReviewSharp.Controllers
         {
             try
             {
-                var validationResult = FileUploadValidator.Validate(Request.Form.Files);
+                var validationResult = _fileProcessingService.ValidateUpload(Request.Form.Files);
                 bool isValid = validationResult.IsValid;
                 var validatedFile = validationResult.File;
                 var errorMessage = validationResult.ErrorMessage;
@@ -49,37 +52,14 @@ namespace ReviewSharp.Controllers
                     ViewBag.ResultsByFile = resultsByFile;
                     ViewBag.UploadType = "Folder";
 
-                    // Extract zip and get code for each file
-                    var tempZipPath = Path.GetTempFileName();
-                    using (var stream = new FileStream(tempZipPath, FileMode.Create))
-                    {
-                        await validatedFile.CopyToAsync(stream);
-                    }
-                    var tempExtractDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                    System.IO.Directory.CreateDirectory(tempExtractDir);
-                    System.IO.Compression.ZipFile.ExtractToDirectory(tempZipPath, tempExtractDir);
-                    var csFiles = Directory.GetFiles(tempExtractDir, "*.cs", SearchOption.AllDirectories);
-                    var fileCodes = new Dictionary<string, string>();
-                    foreach (var filePath in csFiles)
-                    {
-                        var fileName = Path.GetRelativePath(tempExtractDir, filePath);
-                        var code = await System.IO.File.ReadAllTextAsync(filePath);
-                        fileCodes[fileName] = code;
-                    }
-                    // Serialize to Session
+                    var fileCodes = await _fileProcessingService.ExtractZipAndReadCodesAsync(validatedFile);
                     HttpContext.Session.SetString("ResultsByFile", System.Text.Json.JsonSerializer.Serialize(resultsByFile));
                     HttpContext.Session.SetString("FileCodes", System.Text.Json.JsonSerializer.Serialize(fileCodes));
-                    try { System.IO.File.Delete(tempZipPath); System.IO.Directory.Delete(tempExtractDir, true); } catch { }
-
                     return View("ResultFolder");
                 }
                 else
                 {
-                    string code;
-                    using (var reader = new StreamReader(validatedFile.OpenReadStream()))
-                    {
-                        code = await reader.ReadToEndAsync();
-                    }
+                    var code = await _fileProcessingService.ReadFileContentAsync(validatedFile);
                     var results = await _orchestratorService.ReviewAsync(validatedFile);
                     ViewBag.Results = results;
                     ViewBag.Code = code;
