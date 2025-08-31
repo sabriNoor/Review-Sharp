@@ -4,6 +4,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 // Register code review services and parser
 builder.Services.AddScoped<ICodeParserService, CodeParserService>();
@@ -46,6 +53,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseRouting();
 
+app.UseSession();
+
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -54,7 +63,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=CodeReview}/{action=Upload}/{id?}")
     .WithStaticAssets();
-
 
 // Add route for CodeReview
 app.MapControllerRoute(

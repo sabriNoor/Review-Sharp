@@ -7,5 +7,6 @@ namespace ReviewSharp.Interfaces
     public interface ICodeReviewOrchestratorService
     {
         Task<List<Models.CodeReviewResult>> ReviewAsync(IFormFile file);
+        Task<Dictionary<string, List<Models.CodeReviewResult>>> ReviewFolderAsync(IFormFile zipFile);
     }
 }
