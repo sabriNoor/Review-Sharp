@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ReviewSharp.Interfaces;
 using ReviewSharp.Models;
 using ReviewSharp.Services;
+using ReviewSharp.Validation;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -29,23 +30,26 @@ namespace ReviewSharp.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadFile()
         {
-            var file = Request.Form.Files[0];
-            if (file == null || file.Length == 0)
+            var validation = FileUploadValidator.Validate(Request.Form.Files);
+            if (!validation.IsValid)
             {
-                ViewBag.Error = "Please select a C# source file.";
+                ViewBag.Error = validation.ErrorMessage;
                 return View("Upload");
             }
 
-            string code;
-            using (var reader = new StreamReader(file.OpenReadStream()))
-            {
-                code = await reader.ReadToEndAsync();
-            }
-
+            var file = validation.File!;
+            var code = await ReadFileContentAsync(file);
             var results = await _orchestratorService.ReviewAsync(file);
             ViewBag.Results = results;
             ViewBag.Code = code;
             return View("Result");
+        }
+
+
+        private async Task<string> ReadFileContentAsync(IFormFile file)
+        {
+            using var reader = new StreamReader(file.OpenReadStream());
+            return await reader.ReadToEndAsync();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
