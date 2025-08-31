@@ -30,62 +30,68 @@ namespace ReviewSharp.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadFile()
         {
-            if (Request.Form.Files.Count == 0)
+            try
             {
-                ViewBag.Error = "Please select a file or zipped folder.";
+                var validationResult = FileUploadValidator.Validate(Request.Form.Files);
+                bool isValid = validationResult.IsValid;
+                var validatedFile = validationResult.File;
+                var errorMessage = validationResult.ErrorMessage;
+                bool isZip = validationResult.IsZip;
+                if (!isValid || validatedFile == null)
+                {
+                    ViewBag.Error = errorMessage ?? "Please select a file or zipped folder.";
+                    return View("Upload");
+                }
+
+                if (isZip)
+                {
+                    var resultsByFile = await _orchestratorService.ReviewFolderAsync(validatedFile);
+                    ViewBag.ResultsByFile = resultsByFile;
+                    ViewBag.UploadType = "Folder";
+
+                    // Extract zip and get code for each file
+                    var tempZipPath = Path.GetTempFileName();
+                    using (var stream = new FileStream(tempZipPath, FileMode.Create))
+                    {
+                        await validatedFile.CopyToAsync(stream);
+                    }
+                    var tempExtractDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                    System.IO.Directory.CreateDirectory(tempExtractDir);
+                    System.IO.Compression.ZipFile.ExtractToDirectory(tempZipPath, tempExtractDir);
+                    var csFiles = Directory.GetFiles(tempExtractDir, "*.cs", SearchOption.AllDirectories);
+                    var fileCodes = new Dictionary<string, string>();
+                    foreach (var filePath in csFiles)
+                    {
+                        var fileName = Path.GetRelativePath(tempExtractDir, filePath);
+                        var code = await System.IO.File.ReadAllTextAsync(filePath);
+                        fileCodes[fileName] = code;
+                    }
+                    // Serialize to Session
+                    HttpContext.Session.SetString("ResultsByFile", System.Text.Json.JsonSerializer.Serialize(resultsByFile));
+                    HttpContext.Session.SetString("FileCodes", System.Text.Json.JsonSerializer.Serialize(fileCodes));
+                    try { System.IO.File.Delete(tempZipPath); System.IO.Directory.Delete(tempExtractDir, true); } catch { }
+
+                    return View("ResultFolder");
+                }
+                else
+                {
+                    string code;
+                    using (var reader = new StreamReader(validatedFile.OpenReadStream()))
+                    {
+                        code = await reader.ReadToEndAsync();
+                    }
+                    var results = await _orchestratorService.ReviewAsync(validatedFile);
+                    ViewBag.Results = results;
+                    ViewBag.Code = code;
+                    ViewBag.UploadType = "SingleFile";
+                    return View("Result");
+                }
+            }
+            catch (Exception)
+            {
+                // Log the exception (not implemented here)
+                ViewBag.Error = "An error occurred while processing your request.";
                 return View("Upload");
-            }
-
-            var file = Request.Form.Files[0];
-            if (file == null || file.Length == 0)
-            {
-                ViewBag.Error = "Please select a file or zipped folder.";
-                return View("Upload");
-            }
-
-            // If zip, treat as folder upload
-            if (Path.GetExtension(file.FileName).Equals(".zip", System.StringComparison.OrdinalIgnoreCase))
-            {
-                var resultsByFile = await _orchestratorService.ReviewFolderAsync(file);
-                ViewBag.ResultsByFile = resultsByFile;
-                ViewBag.UploadType = "Folder";
-
-                // Extract zip and get code for each file
-                var tempZipPath = Path.GetTempFileName();
-                using (var stream = new FileStream(tempZipPath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-                var tempExtractDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                System.IO.Directory.CreateDirectory(tempExtractDir);
-                System.IO.Compression.ZipFile.ExtractToDirectory(tempZipPath, tempExtractDir);
-                var csFiles = Directory.GetFiles(tempExtractDir, "*.cs", SearchOption.AllDirectories);
-                var fileCodes = new Dictionary<string, string>();
-                foreach (var filePath in csFiles)
-                {
-                    var fileName = Path.GetRelativePath(tempExtractDir, filePath);
-                    var code = await System.IO.File.ReadAllTextAsync(filePath);
-                    fileCodes[fileName] = code;
-                }
-                // Serialize to Session
-                HttpContext.Session.SetString("ResultsByFile", System.Text.Json.JsonSerializer.Serialize(resultsByFile));
-                HttpContext.Session.SetString("FileCodes", System.Text.Json.JsonSerializer.Serialize(fileCodes));
-                try { System.IO.File.Delete(tempZipPath); System.IO.Directory.Delete(tempExtractDir, true); } catch { }
-
-                return View("ResultFolder");
-            }
-            else
-            {
-                string code;
-                using (var reader = new StreamReader(file.OpenReadStream()))
-                {
-                    code = await reader.ReadToEndAsync();
-                }
-                var results = await _orchestratorService.ReviewAsync(file);
-                ViewBag.Results = results;
-                ViewBag.Code = code;
-                ViewBag.UploadType = "SingleFile";
-                return View("Result");
             }
         }
 
