@@ -9,18 +9,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-
+using ReviewSharp.Payload;
 namespace ReviewSharp.Controllers
 {
     public class CodeReviewController : Controller
     {
         private readonly ICodeReviewOrchestratorService _orchestratorService;
         private readonly IFileProcessingService _fileProcessingService;
-        private readonly ReviewResultStorageService _reviewResultStorageService;
+        private readonly IReviewResultStorageService _reviewResultStorageService;
 
         public CodeReviewController(ICodeReviewOrchestratorService orchestratorService,
             IFileProcessingService fileProcessingService,
-            ReviewResultStorageService reviewResultStorageService)
+            IReviewResultStorageService reviewResultStorageService)
         {
             _orchestratorService = orchestratorService;
             _fileProcessingService = fileProcessingService;
@@ -139,6 +139,7 @@ namespace ReviewSharp.Controllers
             ViewBag.UploadType = "Folder";
             return View();
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

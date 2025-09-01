@@ -2,15 +2,10 @@ using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using ReviewSharp.Interfaces;
 
 namespace ReviewSharp.Services
 {
-    public interface IFileProcessingService
-    {
-        (bool IsValid, IFormFile? File, string? ErrorMessage, bool IsZip) ValidateUpload(IFormFileCollection files);
-        Task<Dictionary<string, string>> ExtractZipAndReadCodesAsync(IFormFile zipFile);
-        Task<string> ReadFileContentAsync(IFormFile file);
-    }
 
     public class FileProcessingService : IFileProcessingService
     {

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-
+using ReviewSharp.Payload;
+using ReviewSharp.Interfaces;
 namespace ReviewSharp.Services
 {
-    public class ReviewResultStorageService
+    public class ReviewResultStorageService : IReviewResultStorageService
     {
         private static string TempDir => Path.Combine(Path.GetTempPath(), "ReviewSharpResults");
 
@@ -34,10 +35,5 @@ namespace ReviewSharp.Services
             return JsonSerializer.Deserialize<ReviewResultPayload>(json);
         }
 
-        public class ReviewResultPayload
-        {
-            public Dictionary<string, List<ReviewSharp.Models.CodeReviewResult>> ResultsByFile { get; set; } = new();
-            public Dictionary<string, string> FileCodes { get; set; } = new();
-        }
     }
 }

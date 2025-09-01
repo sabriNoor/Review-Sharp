@@ -40,7 +40,7 @@ builder.Services.AddScoped<ICodeReviewSemanticService, BoxingUnboxingService>();
 builder.Services.AddScoped<ICodeReviewService, FileNameMatchClassService>();
 builder.Services.AddScoped<ICodeReviewService, NestedBlockDepthService>();
 builder.Services.AddScoped<IFileProcessingService, FileProcessingService>();
-builder.Services.AddSingleton<ReviewSharp.Services.ReviewResultStorageService>();
+builder.Services.AddSingleton<IReviewResultStorageService,ReviewResultStorageService>();
 
 
 var app = builder.Build();
