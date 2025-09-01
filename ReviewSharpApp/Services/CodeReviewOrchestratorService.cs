@@ -90,7 +90,9 @@ namespace ReviewSharp.Services
             var fileMap = new Dictionary<string, SyntaxTree>();
             foreach (var filePath in csFiles)
             {
-                var fileName = Path.GetRelativePath(tempExtractDir, filePath);
+                var fileName = Path.GetRelativePath(tempExtractDir, filePath)
+                    .Replace("\\", "/")
+                    .ToLowerInvariant();
                 if (IsNonReviewable(filePath, fileName)) continue;
                 try
                 {
