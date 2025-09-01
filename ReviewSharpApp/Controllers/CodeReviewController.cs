@@ -14,14 +14,17 @@ namespace ReviewSharp.Controllers
 {
     public class CodeReviewController : Controller
     {
-    private readonly ICodeReviewOrchestratorService _orchestratorService;
-    private readonly IFileProcessingService _fileProcessingService;
+        private readonly ICodeReviewOrchestratorService _orchestratorService;
+        private readonly IFileProcessingService _fileProcessingService;
+        private readonly ReviewResultStorageService _reviewResultStorageService;
 
-        public CodeReviewController(ICodeReviewOrchestratorService orchestratorService
-        , IFileProcessingService fileProcessingService)
+        public CodeReviewController(ICodeReviewOrchestratorService orchestratorService,
+            IFileProcessingService fileProcessingService,
+            ReviewResultStorageService reviewResultStorageService)
         {
             _orchestratorService = orchestratorService;
             _fileProcessingService = fileProcessingService;
+            _reviewResultStorageService = reviewResultStorageService;
         }
 
         [HttpGet]
@@ -49,13 +52,11 @@ namespace ReviewSharp.Controllers
                 if (isZip)
                 {
                     var resultsByFile = await _orchestratorService.ReviewFolderAsync(validatedFile);
-                    ViewBag.ResultsByFile = resultsByFile;
-                    ViewBag.UploadType = "Folder";
-
                     var fileCodes = await _fileProcessingService.ExtractZipAndReadCodesAsync(validatedFile);
-                    HttpContext.Session.SetString("ResultsByFile", System.Text.Json.JsonSerializer.Serialize(resultsByFile));
-                    HttpContext.Session.SetString("FileCodes", System.Text.Json.JsonSerializer.Serialize(fileCodes));
-                    return View("ResultFolder");
+                    var key = await _reviewResultStorageService.SaveResultsAsync(resultsByFile, fileCodes);
+                    HttpContext.Session.SetString("ReviewResultKey", key);
+                    ViewBag.UploadType = "Folder";
+                    return RedirectToAction("ResultFolder", new { key });
                 }
                 else
                 {
@@ -76,35 +77,39 @@ namespace ReviewSharp.Controllers
         }
 
         [HttpGet]
-        public IActionResult ShowFileResult(string fileName)
+        public async Task<IActionResult> ShowFileResult(string fileName)
         {
             try
             {
-                // Deserialize from Session
-                var resultsByFileJson = HttpContext.Session.GetString("ResultsByFile");
-                var fileCodesJson = HttpContext.Session.GetString("FileCodes");
-                if (string.IsNullOrEmpty(resultsByFileJson) || string.IsNullOrEmpty(fileCodesJson))
+                var key = HttpContext.Session.GetString("ReviewResultKey") ?? (Request.Query["key"].ToString() ?? "");
+                if (string.IsNullOrEmpty(key))
+                {
+                    TempData["Error"] = "Session expired or review results not found. Please re-upload your files.";
+                    return RedirectToAction("Upload");
+                }
+                var payload = await _reviewResultStorageService.LoadResultsAsync(key);
+                if (payload == null)
+                {
+                    TempData["Error"] = "Review results not found. Please re-upload your files.";
+                    return RedirectToAction("Upload");
+                }
+                var normalizedFileName = System.Net.WebUtility.UrlDecode(fileName)
+                    .Replace("\\", "/")
+                    .ToLowerInvariant();
+                if (!payload.ResultsByFile.ContainsKey(normalizedFileName) || !payload.FileCodes.ContainsKey(normalizedFileName))
                 {
                     TempData["Error"] = "File not found in review results.";
-                    return RedirectToAction("ResultFolder");
+                    return RedirectToAction("ResultFolder", new { key });
                 }
-                var resultsByFile = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, List<CodeReviewResult>>>(resultsByFileJson);
-                var fileCodes = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(fileCodesJson);
-                if (resultsByFile == null || fileCodes == null || !resultsByFile.ContainsKey(fileName) || !fileCodes.ContainsKey(fileName))
-                {
-                    TempData["Error"] = "File not found in review results.";
-                    return RedirectToAction("ResultFolder");
-                }
-                ViewBag.Results = resultsByFile[fileName];
-                ViewBag.Code = fileCodes[fileName];
-                ViewBag.FileName = fileName;
+                ViewBag.Results = payload.ResultsByFile[normalizedFileName];
+                ViewBag.Code = payload.FileCodes[normalizedFileName];
+                ViewBag.FileName = normalizedFileName;
                 return View("Result");
             }
             catch (Exception)
             {
-                // Log the exception (not implemented here)
                 TempData["Error"] = "An error occurred while retrieving the file results.";
-                return RedirectToAction("ResultFolder");
+                return RedirectToAction("Upload");
             }
         }
 
@@ -113,6 +118,26 @@ namespace ReviewSharp.Controllers
         {
             using var reader = new StreamReader(file.OpenReadStream());
             return await reader.ReadToEndAsync();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ResultFolder(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                TempData["Error"] = "Session expired or review results not found. Please re-upload your files.";
+                return RedirectToAction("Upload");
+            }
+            var payload = await _reviewResultStorageService.LoadResultsAsync(key);
+            if (payload == null)
+            {
+                TempData["Error"] = "Review results not found. Please re-upload your files.";
+                return RedirectToAction("Upload");
+            }
+            ViewBag.ResultsByFile = payload.ResultsByFile;
+            ViewBag.FileCodes = payload.FileCodes;
+            ViewBag.UploadType = "Folder";
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

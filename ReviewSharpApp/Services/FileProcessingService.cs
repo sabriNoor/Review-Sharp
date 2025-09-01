@@ -33,9 +33,11 @@ namespace ReviewSharp.Services
             var csFiles = Directory.GetFiles(tempExtractDir, "*.cs", SearchOption.AllDirectories);
             foreach (var filePath in csFiles)
             {
-                var fileName = Path.GetRelativePath(tempExtractDir, filePath);
-                var code = await File.ReadAllTextAsync(filePath);
-                fileCodes[fileName] = code;
+                var fileName = Path.GetRelativePath(tempExtractDir, filePath)
+                    .Replace("\\", "/")
+                    .ToLowerInvariant();
+                // Ensure normalization is consistent
+                fileCodes[fileName] = await File.ReadAllTextAsync(filePath);
             }
             try { File.Delete(tempZipPath); Directory.Delete(tempExtractDir, true); } catch { }
             return fileCodes;

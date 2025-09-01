@@ -55,20 +55,9 @@ function showCodePanel(fileKey) {
 }
 </script>
 
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @{
-    Dictionary<string, List<ReviewSharp.Models.CodeReviewResult>>? resultsByFile = null;
-    Dictionary<string, string>? fileCodes = null;
-    var resultsByFileJson = HttpContextAccessor?.HttpContext?.Session?.GetString("ResultsByFile");
-    var fileCodesJson = HttpContextAccessor?.HttpContext?.Session?.GetString("FileCodes");
-    if (!string.IsNullOrEmpty(resultsByFileJson))
-    {
-        resultsByFile = JsonSerializer.Deserialize<Dictionary<string, List<ReviewSharp.Models.CodeReviewResult>>>(resultsByFileJson) ?? new();
-    }
-    if (!string.IsNullOrEmpty(fileCodesJson))
-    {
-        fileCodes = JsonSerializer.Deserialize<Dictionary<string, string>>(fileCodesJson) ?? new();
-    }
+    var resultsByFile = ViewBag.ResultsByFile as Dictionary<string, List<ReviewSharp.Models.CodeReviewResult>>;
+    var fileCodes = ViewBag.FileCodes as Dictionary<string, string>;
 }
 <div class="container-fluid py-4" style="max-width: 1400px; margin:auto;">
     @if (TempData["Error"] != null)
@@ -96,7 +85,7 @@ function showCodePanel(fileKey) {
                 <div class="card-header bg-dark text-white rounded-top-4 d-flex justify-content-between align-items-center">
                     <strong>@fileKey</strong>
                     <span class="badge bg-info px-3 py-2">@fileResults.Count Total</span>
-                    <a class="btn btn-outline-primary btn-sm ms-3" href="@Url.Action("ShowFileResult", "CodeReview", new { fileName = fileKey })" target="_blank">Show Code</a>
+                    <a class="btn btn-outline-primary btn-sm ms-3" href="@Url.Action("ShowFileResult", "CodeReview", new { fileName = System.Net.WebUtility.UrlEncode(fileKey), key = ViewContext.RouteData.Values["key"] ?? (Context.Request.Query["key"].ToString() ?? (ViewBag.Key ?? "")) })" target="_blank">Show Code</a>
                 </div>
                 <div class="card-body p-3">
                     <div id="code-panel-@panelKey" style="display:none;">
