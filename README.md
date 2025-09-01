@@ -14,7 +14,8 @@ ReviewSharp is an extensible ASP.NET MVC application for automated code review o
 ## Video Demo 
 https://drive.google.com/drive/folders/1z45Czz-6p9XnVLdSYayt2vUgECLXFIpb?usp=sharing  
 
-📽️ The demo video showcases how ReviewSharp works in action — from uploading files and reviewing C# code, to viewing the analysis results in a clear and interactive interface.
+The demo video showcases how ReviewSharp works in action — from uploading files and reviewing C# code, to viewing the analysis results in a clear and interactive interface.
+
 ---
 ## Features
 
@@ -123,4 +124,5 @@ Contributions are welcome! Please open issues or submit pull requests for improv
 ## License 📄
 
 This project is licensed under the MIT License.
+
 
