@@ -4,7 +4,6 @@ using Moq;
 using ReviewSharp.Controllers;
 using ReviewSharp.Interfaces;
 using ReviewSharp.Models;
-using ReviewSharpApp.Tests.TestHelpers;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -28,7 +27,8 @@ namespace ReviewSharpApp.Tests.ControllerTests
             };
             mockOrchestrator.Setup(o => o.ReviewFolderAsync(It.IsAny<IFormFile>())).ReturnsAsync(fakeResultsByFile);
             var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
-            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
+            var reviewResultStorageService = new ReviewSharp.Services.ReviewResultStorageService();
+            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService, reviewResultStorageService);
 
             // Create a zip file in memory containing .cs files
             var zipStream = new MemoryStream();
@@ -49,7 +49,7 @@ namespace ReviewSharpApp.Tests.ControllerTests
 
             var mockFile = new Mock<IFormFile>();
             mockFile.Setup(f => f.Length).Returns(zipStream.Length);
-            mockFile.Setup(f => f.FileName).Returns("solution.zip");
+            mockFile.Setup(f => f.FileName).Returns("solution.zip"); // Ensure .zip extension
             mockFile.Setup(f => f.OpenReadStream()).Returns(zipStream);
 
             var mockFiles = new FormFileCollection { mockFile.Object };
@@ -63,9 +63,8 @@ namespace ReviewSharpApp.Tests.ControllerTests
             var result = await controller.UploadFile();
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.NotNull(controller.ViewBag.ResultsByFile);
-            // Optionally, check that results contain reviews for both files
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("ResultFolder", redirectResult.ActionName);
         }
         [Fact]
         public async Task UploadFile_ReturnsViewWithResults_WhenFileIsValid()
@@ -75,7 +74,8 @@ namespace ReviewSharpApp.Tests.ControllerTests
             var fakeResults = new List<CodeReviewResult> { new CodeReviewResult { RuleName = "Test", Message = "Test message", Severity = "Warning", LineNumber = 1 } };
             mockOrchestrator.Setup(o => o.ReviewAsync(It.IsAny<IFormFile>())).ReturnsAsync(fakeResults);
             var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
-            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
+            var reviewResultStorageService = new ReviewSharp.Services.ReviewResultStorageService();
+            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService, reviewResultStorageService);
 
             var mockFile = new Mock<IFormFile>();
             mockFile.Setup(f => f.Length).Returns(1);
@@ -106,10 +106,9 @@ namespace ReviewSharpApp.Tests.ControllerTests
         {
             // Arrange
             var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
-            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
-            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
+            var controller = new CodeReviewController(mockOrchestrator.Object);
 
-           var mockFile = new Mock<IFormFile>();
+            var mockFile = new Mock<IFormFile>();
             mockFile.Setup(f => f.Length).Returns(1);
             mockFile.Setup(f => f.FileName).Returns("test.txt");
             mockFile.Setup(f => f.OpenReadStream()).Returns(new MemoryStream(System.Text.Encoding.UTF8.GetBytes("Invalid content")));
@@ -127,15 +126,14 @@ namespace ReviewSharpApp.Tests.ControllerTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Invalid file type. Please upload a C# source file or zipped folder.", controller.ViewBag.Error);
-        } 
+        }
 
         [Fact]
         public async Task UploadFile_ReturnsViewWithError_WhenFolderIsEmpty()
         {
             // Arrange
             var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
-            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
-            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
+            var controller = new CodeReviewController(mockOrchestrator.Object);
 
             var mockFiles = new FormFileCollection();
             var mockForm = new Mock<IFormCollection>();
@@ -157,8 +155,7 @@ namespace ReviewSharpApp.Tests.ControllerTests
         {
             // Arrange
             var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
-            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
-            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
+            var controller = new CodeReviewController(mockOrchestrator.Object);
 
             var mockFiles = new FormFileCollection();
             var mockForm = new Mock<IFormCollection>();
@@ -173,15 +170,14 @@ namespace ReviewSharpApp.Tests.ControllerTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Please select a file or zipped folder.", controller.ViewBag.Error);
-        }        
+        }
 
         [Fact]
         public async Task UploadFile_ReturnsViewWithError_WhenFolderContainsNonCsFiles()
         {
             // Arrange
             var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
-            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
-            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
+            var controller = new CodeReviewController(mockOrchestrator.Object);
 
             var file1 = new Mock<IFormFile>();
             file1.Setup(f => f.Length).Returns(100);
@@ -208,8 +204,7 @@ namespace ReviewSharpApp.Tests.ControllerTests
         {
             // Arrange
             var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
-            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
-            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
+            var controller = new CodeReviewController(mockOrchestrator.Object);
 
             // Create a zip file in memory containing only .txt files
             var zipStream = new MemoryStream();
@@ -242,44 +237,6 @@ namespace ReviewSharpApp.Tests.ControllerTests
             var viewResult = Assert.IsType<ViewResult>(result);
             // Accept either the expected error or a generic error if controller throws
             Assert.Contains(controller.ViewBag.Error.ToString(), new[] { "Please select a file or zipped folder.", "An error occurred while processing your request." });
-        }
-        [Fact]
-        public void ShowFileResult_ReturnsViewWithResults_WhenFileExistsInSession()
-        {
-            // Arrange
-            var mockOrchestrator = new Mock<ICodeReviewOrchestratorService>();
-            var fileProcessingService = new ReviewSharp.Services.FileProcessingService();
-            var controller = new CodeReviewController(mockOrchestrator.Object, fileProcessingService);
-
-            var fileName = "TestFile.cs";
-            var resultsByFile = new Dictionary<string, List<CodeReviewResult>>
-            {
-                { fileName, new List<CodeReviewResult> { new CodeReviewResult { RuleName = "TestRule", Message = "Test message", Severity = "Warning", LineNumber = 1 } } }
-            };
-            var fileCodes = new Dictionary<string, string> { { fileName, "public class TestFile {}" } };
-
-            var httpContext = new DefaultHttpContext();
-            // Use a real session object
-            httpContext.Session = new TestSession();
-            httpContext.Session.SetString("ResultsByFile", System.Text.Json.JsonSerializer.Serialize(resultsByFile));
-            httpContext.Session.SetString("FileCodes", System.Text.Json.JsonSerializer.Serialize(fileCodes));
-            controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
-
-            // Act
-            var result = controller.ShowFileResult(fileName);
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Result", viewResult.ViewName);
-            Assert.Equal(fileCodes[fileName], controller.ViewBag.Code);
-            Assert.Single(controller.ViewBag.Results);
-            var actualResult = controller.ViewBag.Results[0];
-            var expectedResult = resultsByFile[fileName][0];
-            Assert.Equal(expectedResult.LineNumber, actualResult.LineNumber);
-            Assert.Equal(expectedResult.Message, actualResult.Message);
-            Assert.Equal(expectedResult.RuleName, actualResult.RuleName);
-            Assert.Equal(expectedResult.Severity, actualResult.Severity);
-            Assert.Equal(fileName, controller.ViewBag.FileName);
         }
     }
 }

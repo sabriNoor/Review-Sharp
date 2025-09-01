@@ -87,23 +87,26 @@ namespace ReviewSharp.Services
 
             // Parse each file using parserService, but build a shared compilation for semantic analysis
             var syntaxTrees = new List<SyntaxTree>();
-            var fileMap = new Dictionary<string, SyntaxTree>();
+            var fileMap = new Dictionary<string, (SyntaxTree SyntaxTree, string OriginalFileName)>();
             foreach (var filePath in csFiles)
             {
-                var fileName = Path.GetRelativePath(tempExtractDir, filePath);
-                if (IsNonReviewable(filePath, fileName)) continue;
+                var normalizedFileName = Path.GetRelativePath(tempExtractDir, filePath)
+                    .Replace("\\", "/")
+                    .ToLowerInvariant();
+                var originalFileName = Path.GetFileNameWithoutExtension(filePath);
+                if (IsNonReviewable(filePath, normalizedFileName)) continue;
                 try
                 {
                     // Read file into memory for FormFile
                     var fileBytes = await File.ReadAllBytesAsync(filePath);
                     using var memStream = new MemoryStream(fileBytes);
-                    var formFile = new FormFile(memStream, 0, memStream.Length, fileName, fileName);
+                    var formFile = new FormFile(memStream, 0, memStream.Length, normalizedFileName, normalizedFileName);
                     var compilation = await _parserService.ParseAsync(formFile);
                     var syntaxTree = compilation.SyntaxTrees.FirstOrDefault();
                     if (syntaxTree != null)
                     {
                         syntaxTrees.Add(syntaxTree);
-                        fileMap[fileName] = syntaxTree;
+                        fileMap[normalizedFileName] = (syntaxTree, originalFileName);
                     }
                 }
                 catch
@@ -122,13 +125,21 @@ namespace ReviewSharp.Services
             foreach (var kv in fileMap)
             {
                 var fileName = kv.Key;
-                var syntaxTree = kv.Value;
+                var syntaxTree = kv.Value.SyntaxTree;
+                var originalFileName = kv.Value.OriginalFileName;
                 var root = (CompilationUnitSyntax)await syntaxTree.GetRootAsync();
                 var semanticModel = sharedCompilation.GetSemanticModel(syntaxTree);
                 var fileResults = new List<Models.CodeReviewResult>();
                 foreach (var service in _reviewServices)
                 {
-                    fileResults.AddRange(service.Review(root));
+                    if (service is FileNameMatchClassService fileNameMatchService)
+                    {
+                        fileResults.AddRange(fileNameMatchService.ReviewWithOriginal(root, originalFileName));
+                    }
+                    else
+                    {
+                        fileResults.AddRange(service.Review(root));
+                    }
                 }
                 foreach (var service in _semanticReviewServices)
                 {

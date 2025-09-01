@@ -41,6 +41,7 @@ builder.Services.AddScoped<ICodeReviewSemanticService, UnusedUsingService>();
 builder.Services.AddScoped<ICodeReviewService, FileNameMatchClassService>();
 builder.Services.AddScoped<ICodeReviewService, NestedBlockDepthService>();
 builder.Services.AddScoped<IFileProcessingService, FileProcessingService>();
+builder.Services.AddSingleton<ReviewSharp.Services.ReviewResultStorageService>();
 
 
 var app = builder.Build();
@@ -51,7 +52,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
     app.UseHttpsRedirection();
 }
-
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseSession();
