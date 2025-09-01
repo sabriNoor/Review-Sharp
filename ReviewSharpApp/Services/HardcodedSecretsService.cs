@@ -45,6 +45,7 @@ namespace ReviewSharp.Services
         private bool IsPotentialSecret(string name, string value)
         {
             return SecretPattern.IsMatch(name) && !string.IsNullOrEmpty(value) && ValuePattern.IsMatch(value);
+        }
         // Helper to detect configuration/environment-based assignments
         private bool IsConfigurationBased(ExpressionSyntax valueSyntax)
         {
@@ -55,6 +56,7 @@ namespace ReviewSharp.Services
                 text.Contains("config[") ||
                 text.Contains("GetSection(") ||
                 text.Contains("GetValue(") ||
+                text.Contains("GetConnectionString(") ||
                 text.Contains("Environment.GetEnvironmentVariable") ||
                 text.Contains("builder.Configuration[") ||
                 text.Contains("appSettings[") ||
@@ -63,7 +65,7 @@ namespace ReviewSharp.Services
                 return true;
             return false;
         }
-        }
+        
 
         private CodeReviewResult CreateResult(string type, string name, VariableDeclaratorSyntax variable)
         {
@@ -76,4 +78,5 @@ namespace ReviewSharp.Services
             };
         }
     }
+
 }
