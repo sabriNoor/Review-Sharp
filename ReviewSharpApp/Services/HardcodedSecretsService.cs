@@ -31,7 +31,7 @@ namespace ReviewSharp.Services
                 var valueText = valueSyntax?.ToString() ?? string.Empty;
 
                 // Skip if value is from configuration or environment
-                if (IsConfigurationBased(valueSyntax))
+                if (valueSyntax != null && IsConfigurationBased(valueSyntax))
                     continue;
 
                 if (IsPotentialSecret(name, valueText))
