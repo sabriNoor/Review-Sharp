@@ -27,7 +27,14 @@ namespace ReviewSharp.Services
             foreach (var variable in assignments)
             {
                 var name = variable.Identifier.Text;
-                if (IsPotentialSecret(name, variable.Initializer?.Value?.ToString() ?? string.Empty))
+                var valueSyntax = variable.Initializer?.Value;
+                var valueText = valueSyntax?.ToString() ?? string.Empty;
+
+                // Skip if value is from configuration or environment
+                if (valueSyntax != null && IsConfigurationBased(valueSyntax))
+                    continue;
+
+                if (IsPotentialSecret(name, valueText))
                 {
                     results.Add(CreateResult("Variable", name, variable));
                 }
@@ -39,6 +46,26 @@ namespace ReviewSharp.Services
         {
             return SecretPattern.IsMatch(name) && !string.IsNullOrEmpty(value) && ValuePattern.IsMatch(value);
         }
+        // Helper to detect configuration/environment-based assignments
+        private bool IsConfigurationBased(ExpressionSyntax valueSyntax)
+        {
+            if (valueSyntax == null) return false;
+            var text = valueSyntax.ToString();
+            // Common patterns for config/environment
+            if (text.Contains("Configuration[") ||
+                text.Contains("config[") ||
+                text.Contains("GetSection(") ||
+                text.Contains("GetValue(") ||
+                text.Contains("GetConnectionString(") ||
+                text.Contains("Environment.GetEnvironmentVariable") ||
+                text.Contains("builder.Configuration[") ||
+                text.Contains("appSettings[") ||
+                text.Contains("Options.Value")
+            )
+                return true;
+            return false;
+        }
+        
 
         private CodeReviewResult CreateResult(string type, string name, VariableDeclaratorSyntax variable)
         {
@@ -51,4 +78,5 @@ namespace ReviewSharp.Services
             };
         }
     }
+
 }
