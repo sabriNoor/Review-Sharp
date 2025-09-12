@@ -1,0 +1,129 @@
+@{
+    ViewBag.Title = "Upload C# File";
+}
+
+<div class="min-vh-100 d-flex flex-column align-items-center justify-content-center bg-light p-4">
+
+    <!-- Mission / Description -->
+    <div class="text-center mb-5">
+        <h1 class="fw-bold mb-3">Code Review Assistant</h1>
+        <p class="lead text-secondary" style="max-width: 600px; margin: auto;">
+            Our mission is to help developers write cleaner and more efficient code.
+            This app allows you to upload your <strong>C# files</strong>, and it will analyze them,
+            detect potential issues, and suggest improvements to enhance performance,
+            readability, and best practices.
+        </p>
+    </div>
+
+    <!-- Upload Card -->
+    <div class="card shadow-lg rounded-4 border-0" style="max-width: 500px; width: 100%;">
+        <div class="card-body text-center p-5">
+            <form id="uploadForm" asp-controller="CodeReview" asp-action="UploadFile" method="post"
+                enctype="multipart/form-data">
+
+                <!-- Dropzone -->
+                <div id="dropzone"
+                    class="border border-2 border-dashed rounded-4 p-5 bg-white d-flex flex-column align-items-center justify-content-center"
+                    role="button" aria-label="Upload .cs file or zipped folder" style="cursor: pointer;">
+                    <img src="~/favicon.ico" alt="upload"
+                        style="width:64px;height:64px; opacity:.85; margin-bottom:15px;" />
+                    <h5 class="fw-semibold mb-2">Drag & Drop</h5>
+                    <p class="text-muted mb-3">Upload a single <code>.cs</code> file <b>or</b> a <code>.zip</code>
+                        folder containing multiple files and subfolders.</p>
+                    <input id="fileInput" type="file" name="file" accept=".cs,.zip" required class="d-none" />
+                    <button type="button" id="browseBtn" class="btn btn-outline-primary px-4 rounded-pill">
+                        Browse Files or Folder
+                    </button>
+                    <div id="fileName" class="text-secondary mt-3"></div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submitBtn" class="btn btn-primary mt-4 px-5 py-2 rounded-pill fw-semibold">
+                    <span id="btnText">Upload & Review</span>
+                    <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"
+                        aria-hidden="true"></span>
+                </button>
+
+                <noscript>
+                    <div class="mt-3 alert alert-info">
+                        JavaScript is disabled. Use the file dialog above to select your .cs file, then click Upload &
+                        Review.
+                    </div>
+                </noscript>
+            </form>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="mt-3 text-danger">@ViewBag.Error</div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const dz = document.getElementById('dropzone');
+            const input = document.getElementById('fileInput');
+            const browse = document.getElementById('browseBtn');
+            const fileName = document.getElementById('fileName');
+            const form = document.getElementById('uploadForm');
+            const btn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+
+            function setFileFromList(fileList) {
+                try {
+                    if (window.DataTransfer) {
+                        const dt = new DataTransfer();
+                        for (let i = 0; i < fileList.length; i++) dt.items.add(fileList[i]);
+                        input.files = dt.files;
+                    } else {
+                        input.files = fileList;
+                    }
+                } catch (e) {
+                    input.click();
+                }
+                if (input.files && input.files.length > 0) {
+                    fileName.textContent = input.files[0].name;
+                    fileName.classList.remove("text-danger");
+                }
+            }
+
+            dz.addEventListener('click', (e) => {
+                if (e.target === browse) return;
+                input.click();
+            });
+
+            browse.addEventListener('click', (e) => { e.preventDefault(); input.click(); });
+
+            dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('bg-light'); });
+            dz.addEventListener('dragleave', () => dz.classList.remove('bg-light'));
+            dz.addEventListener('drop', (e) => {
+                e.preventDefault(); dz.classList.remove('bg-light');
+                if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    setFileFromList(e.dataTransfer.files);
+                }
+            });
+
+            input.addEventListener('change', () => {
+                if (input.files && input.files.length > 0) {
+                    fileName.textContent = input.files[0].name;
+                    fileName.classList.remove("text-danger");
+                }
+            });
+
+            // When form is submitted => disable everything
+            form.addEventListener('submit', () => {
+                btn.disabled = true;
+                btnText.textContent = "Uploading...";
+                btnSpinner.classList.remove("d-none");
+
+                // Disable browse button + dropzone
+                browse.disabled = true;
+                dz.style.pointerEvents = "none";
+                dz.style.opacity = "0.6";
+            });
+        })();
+    </script>
+}
